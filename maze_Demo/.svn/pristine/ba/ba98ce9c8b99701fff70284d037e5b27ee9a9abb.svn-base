@@ -1,0 +1,1012 @@
+/*//探索其他动作
+		if(actionList.size()<6 || actionList.size()==6) {
+			for(Anticipation anti:anticipations) {
+				if(!actionList.contains(anti.getInteraction().getExperience().getAction())) {
+					selectedAnticipation = anti;
+				}
+			}
+		}else {
+			System.out.println("all actions are visited");
+		}
+		
+		*/
+		
+
+		
+		
+		if(!isAllVisited()) {//选取之前没有访问过的primitive interaction
+			System.out.println("not all primitive interactions are visited");
+			selectedAnticipation = (Anticipation)anticipations.get(0);
+			
+			for(Anticipation anti : anticipations) {
+				if(!anti.getInteraction().isVisited) {
+					selectedAnticipation = anti;
+					break;
+				}
+			}
+			
+			//如果一直持续primitive interaction的valence>0
+			
+		}else {
+			selectedAnticipation = (Anticipation)anticipations.get(0);
+			System.out.println("all primitive interactions are visited");
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		List<Interaction> contextInteractions = new ArrayList<Interaction>();
+		if (this.getEnactedInteraction()!=null){
+			contextInteractions.add(this.getEnactedInteraction());
+			if (!this.getEnactedInteraction().isPrimitive())// the situation that PreviousEnactedInteraction is composite interaction
+				contextInteractions.add(this.getEnactedInteraction().getPostInteraction());
+			if (this.getSuperInteraction() != null)
+				contextInteractions.add(this.getSuperInteraction());
+		}
+		
+		String contextString = "";
+		for(Interaction inte : contextInteractions) {
+			contextString+=inte;
+		}
+		System.out.println("contextInteractions are:"+contextString);
+		
+		
+		
+		
+		
+		for (Interaction activatedInteraction : this.INTERACTIONS.values()){
+			if (contextInteractions.contains(activatedInteraction.getPreInteraction())){
+				activatedInteractions.add(activatedInteraction);
+			}
+			/*
+			if (!activatedInteraction.isPrimitive())//looking for anticipations from composite interactins in the INTERACTIONS
+				if (contextInteractions.contains(activatedInteraction.getPreInteraction())){
+					activatedInteractions.add(activatedInteraction);
+				}
+			*/
+		}
+		
+		
+		
+		
+		
+		
+		anticipate()
+		/*
+		for (Anticipation anticipation : anticipations){
+			for (Interaction interaction : ((Experiment050)((Anticipation031)anticipation).getExperience()).getEnactedInteractions()){
+				for (Interaction activatedInteraction : activatedInteractions){
+					if (interaction == ((Interaction031)activatedInteraction).getPostInteraction()){
+						int proclivity = ((Interaction031)activatedInteraction).getWeight() * ((Interaction031)interaction).getValence(); 
+						((Anticipation031)anticipation).addProclivity(proclivity);
+					}
+				}
+			}
+		}*/
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+				
+				
+				intendedInteraction.setVisited(true);
+				if(!isAllVisited()) {
+					for(Interaction interaction:INTERACTIONS.values()) {
+						if(!interaction.isPrimitive()) {
+							if(interaction.equals(intendedInteraction)) {
+								interaction.setIntermediate(1);
+								interaction.setTemps(1);
+							}else {
+								interaction.incrementTemps();
+							}
+						}
+					}
+				}
+				
+				
+				
+				
+		Interaction previousSuperInteraction = this.getSuperInteraction();
+		Interaction lastSuperInteraction = null;
+		 
+		 /*
+		if (previousSuperInteraction != null){
+            this.addOrGetAndReinforceCompositeInteraction(previousSuperInteraction.getPreInteraction(), lastSuperInteraction);
+            this.addOrGetAndReinforceCompositeInteraction(previousSuperInteraction, lastInteraction);
+        }
+        this.setSuperInteraction(lastSuperInteraction);
+        */
+		
+		
+		
+		
+				/*if(satisfyList2.size() == threshold || satisfyList2.size() > threshold) {
+			System.out.println("enter the maximize satisfied times");
+			for(Anticipation anti : anticipations) {
+				if(!anti.getInteraction().isVisited) {
+					selectedAnticipation = anti;
+					for(Interaction inte:INTERACTIONS.values()) {
+						if(!inte.isVisited) {
+							inte.setTemps(1);
+							inte.setIntermediate(1);
+						}
+					}
+					break;
+				}
+			}
+			satisfyList2.clear();
+		}*/
+		
+		
+		
+		
+				if(!isAllVisited()) {
+			System.out.println("not all primitive interactions are visited");
+			if(satisfyList2.size() == threshold || satisfyList2.size() > threshold) {
+				System.out.println("entering the maximum visited times");
+				for(Anticipation anti : anticipations) {
+					if(!anti.getInteraction().isVisited) {
+						selectedAnticipation = anti;
+						break;
+					}
+				}
+				satisfyList2.clear();
+			}
+		}else {
+			System.out.println("all interactions are visited");
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		if(satisfyList.size() == 0 ) {
+						satisfyList.add(intendedInteraction);
+					}else {
+						int size = satisfyList.size();
+						if(satisfyList.get(size-1).equals(intendedInteraction)) {
+							satisfyList.add(intendedInteraction);
+						}else {
+							satisfyList.clear();
+						}
+					}
+					System.out.println();
+					System.out.println("the size of satisfyList is:"+satisfyList.size());
+					System.out.println("the satisfyList is:"+satisfyList);
+		
+
+
+
+
+
+
+
+
+	
+		/*if(!isAllVisited()) {
+			System.out.println("not all primitive interactions are visited");
+			if(satisfyList2.size() == threshold || satisfyList2.size() > threshold) {
+				System.out.println("entering the maximum visited times");
+				for(Anticipation anti : anticipations) {
+					if(!anti.getInteraction().isVisited) {
+						selectedAnticipation = anti;
+						break;
+					}
+				}
+				satisfyList2.clear();
+			}
+		}else {
+			System.out.println("all interactions are visited");
+		}*/
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		if(!isAllVisited()) {
+			System.out.println("not all primitive interactions are visited");
+			for(Anticipation anti: anticipations) {
+				Interaction inte = anti.getInteraction();
+				if(inte.isPrimitive() && (!inte.isVisited) ) {
+					selectedAnticipation = anti;
+					break;
+				}
+			}
+		}else {
+			System.out.println("all interactions are visited");
+		}
+		
+		
+		
+		
+		
+		
+		
+				if(satisfyList.size() == 0 ) {
+					satisfyList.add(intendedInteraction);
+				}else {
+					int size = satisfyList.size();
+					if(satisfyList.get(size-1).equals(intendedInteraction)) {
+						satisfyList.add(intendedInteraction);
+					}else {
+						satisfyList.clear();
+					}
+				}
+				
+
+				System.out.println();
+				System.out.println("the size of satisfyList is:"+satisfyList.size());
+				System.out.println("the satisfyList is:"+satisfyList);
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				intendedInteractionList = reasonProcess(enactedInteraction1);
+				if(intendedInteractionList == null) {
+					intendedInteraction = selectOtherInteraction();
+				}else {
+					intendedInteraction = intendedInteractionList.get(0);
+				}
+								
+				
+				
+				
+				
+
+
+
+				
+				
+				/*if(intendedInteractionList == null) {
+					intendedInteraction = selectOtherInteraction();
+				}else {
+					Interaction nextInteraction = intendedInteractionList.get(sequenceIndex);
+					if(enactedInteraction1.equals(nextInteraction)) {
+						intendedInteraction = nextInteraction;
+						sequenceIndex++;
+					}else {
+						intendedInteractionList = reasonningProcess(enactedInteractionList,enactedInteraction1);
+						
+					}
+				}*/
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				if(inte.getValence() >=  maxValence) {
+							if(l<shortDistance) {
+								shortDistance = l;
+								bestSelection = tempInteractionList;
+							}
+						}
+				
+				
+				
+				
+								
+				/*
+				//reasoning 过程
+				intendedInteractionList = reasonningProcess(enactedInteractionList,enactedInteraction1);
+				if(intendedInteractionList == null) {
+					intendedInteraction = selectOtherInteraction(enactedInteraction1);
+				}else {
+					int intendedListSize = intendedInteractionList.size();
+					if(intendedListSize>0) {
+						if(intendedListSize ==1) {
+							intendedInteraction = intendedInteractionList.get(0);//enactedInteraction1
+						}else {
+							intendedInteraction = intendedInteractionList.get(sequenceIndex);
+							//sequenceIndex++;
+							
+						}
+					}
+				}
+				*/
+								
+				
+				
+						
+				if(intendedInteractionList == null) {
+					intendedInteraction = selectOtherInteraction(enactedInteraction1);
+				}else if(intendedInteractionList != null && intendedInteractionList.size() > 0) {
+					if(intendedInteractionList.size() == 1) {
+						if(!enactedInteraction1.equals(intendedInteraction)) {
+							//do something
+							intendedInteraction = selectOtherInteraction(enactedInteraction1);
+						}
+					}else if(intendedInteractionList.size() >1) {
+						//do something
+						int intendedListSize = intendedInteractionList.size();
+						int tempSequenceIndex = sequenceIndex+1;
+						if(enactedInteraction1.equals(intendedInteraction) && tempSequenceIndex<intendedListSize) {
+							sequenceIndex++;
+							intendedInteraction = intendedInteractionList.get(sequenceIndex);
+						}else {
+							//reasoning 过程
+							intendedInteractionList = reasonningProcess(enactedInteractionList,enactedInteraction1);
+							if(intendedInteractionList == null) {
+								intendedInteraction = selectOtherInteraction(enactedInteraction1);
+							}else {
+								intendedListSize = intendedInteractionList.size();
+								if(intendedListSize>0) {
+									if(intendedListSize ==1) {
+										intendedInteraction = intendedInteractionList.get(0);//enactedInteraction1
+									}else {
+										sequenceIndex = 1;
+										intendedInteraction = intendedInteractionList.get(sequenceIndex);
+									}
+								}
+							}
+						}
+					}
+				}
+				
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	/*List<Anticipation> anticipations = anticipate();
+		Interaction interaction1 = selectInteraction(anticipations);
+		return interaction1;*/
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+
+
+
+
+intendedInteractionList = reasonningProcess(enactedInteractionList,enactedInteraction1);
+								if(intendedInteractionList == null) {
+									intendedInteraction = selectOtherInteraction(enactedInteraction1);
+								}else {
+									int intendedListSize = intendedInteractionList.size();
+									if(intendedListSize>0) {
+										if(intendedListSize ==1) {
+											intendedInteraction = intendedInteractionList.get(0);//enactedInteraction1
+										}else {
+											sequenceIndex = 1;
+											intendedInteraction = intendedInteractionList.get(sequenceIndex);
+											intendedInteractionActionList.add(intendedInteraction.getExperience().getAction());
+										}
+										intendedInteractionFlag = true;
+									}
+								}
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+
+intendedInteractionList = reasonningProcess(enactedInteractionList,enactedInteraction1);
+					if(intendedInteractionList == null) {
+						intendedInteraction = selectOtherInteraction(enactedInteraction1);
+					}else {
+						int intendedListSize = intendedInteractionList.size();
+						if(intendedListSize>0) {
+							if(intendedListSize ==1) {
+								intendedInteraction = intendedInteractionList.get(0);//enactedInteraction1
+							}else {
+								sequenceIndex = 1;
+								intendedInteraction = intendedInteractionList.get(sequenceIndex);
+								//sequenceIndex++;
+							}
+							intendedInteractionFlag = true;
+						}
+					}								
+
+			
+			
+			
+	public boolean isContainlList(List<Problem> problemList,List<Interaction> list2) {
+		boolean isContainlList = false;
+		if(problemList.size() > 0) {
+			for(int w=0;w<problemList.size();w++) {
+				List<Interaction> list1 = problemList.get(w).getProblemInteractionList();
+				if(list1.size() == list2.size())  {
+					for(int y=0; y<list1.size();y++) {
+						if(list1.get(y).equals(list2.get(y))) {
+							isContainlList = true;
+						}
+					}
+				}
+			}
+		}
+		return isContainlList;
+	}
+	
+	
+	
+	
+
+	
+	
+	
+	
+
+	
+	
+	
+	
+	
+	public List<Interaction> reasonningProcess(List<Interaction> enactedInteractionList2, Interaction enactedInteraction1) {
+		System.out.println("reasonningProcess()");
+		List<Interaction> bestSelection = null;
+		
+		int size = enactedInteractionList2.size();
+		List<Integer> indexList = new ArrayList<Integer>();
+		for(int i=0;i<size;i++) {
+			Interaction inter = enactedInteractionList2.get(i);
+			if(inter.equals(enactedInteraction1)) {
+				indexList.add(i);
+			}
+		}
+		
+		List<List<Interaction>> multiInteractionList = new ArrayList<List<Interaction>>();
+		int indexListSize = indexList.size();
+		int index_pre;
+		int index_pos;
+		if(indexListSize>0) {
+			for(int j=0;j<indexListSize;j++) {// [0,4]
+				List<Interaction> interactionSmallList = new ArrayList<Interaction>();
+				index_pre = indexList.get(j);
+				if(j+1 < indexListSize) {
+					index_pos = indexList.get(j+1);
+				}else {
+					index_pos = size;
+				}
+				for(int k=index_pre;k<index_pos;k++) {
+					interactionSmallList.add(enactedInteractionList.get(k));
+				}
+				if(!isContainsList(multiInteractionList,interactionSmallList)) {
+					multiInteractionList.add(interactionSmallList);
+				}
+			}
+		}
+		
+		
+		
+		
+		//得到不同序列的interaction之后要开始学习了
+		//对于下一阶段的学习阶段
+		String multiInteractionListString = "";
+		if(multiInteractionList.size() > 0) {
+			int shortDistance=100;
+			double meanValence = 0;
+			for(int h=0;h<multiInteractionList.size();h++) {
+				int tempTotalValence = 0;
+				
+				
+				
+				//获取备选的一个列表
+				List<Interaction> tempInteractionList = multiInteractionList.get(h);
+				multiInteractionListString = multiInteractionListString+tempInteractionList+"\r\n";
+				int tempSize = tempInteractionList.size();
+				if(tempSize>0) {
+					boolean isHaveMaxValence = false;
+					for(int l=0;l<tempSize;l++) {
+						Interaction inte = tempInteractionList.get(l);
+						//计算均值
+						tempTotalValence+=inte.getValence();
+						if(inte.getValence() >=  maxValence) {
+							isHaveMaxValence = true;//只有出现了最大值的tempInteractionList才会考虑
+						}
+						
+					}
+					System.out.println("tempInteractionList is:"+tempInteractionList);
+					System.out.println("maxValence is:"+maxValence+" isHaveMaxValence is:"+isHaveMaxValence);
+					
+					if(isHaveMaxValence) {
+						double tempMeanValence = (double)tempTotalValence/(double)tempSize;
+						BigDecimal bMeanValence = new BigDecimal(Double.toString(meanValence)); 
+				        BigDecimal bTempMeanValence = new BigDecimal(Double.toString(tempMeanValence)); 
+				        System.out.println("tempTotalValence is:"+tempTotalValence+" tempSize is:"+tempSize+" tempMeanValence is:"+tempMeanValence);
+						if(bMeanValence.compareTo(bTempMeanValence)<0) {
+							if(tempSize<shortDistance) {
+								shortDistance = tempSize;
+								meanValence = tempMeanValence;
+								bestSelection = tempInteractionList;
+							}
+						}
+					}//if isHaveMaxValence
+				}
+			}// end for 备选列表
+			System.out.println("shortDistance is:"+shortDistance+" meanValence is:"+meanValence);
+			System.out.println();
+		}// if multiInteractionList
+		System.out.println("multiInteractionList is:");
+		System.out.println(multiInteractionListString);
+		System.out.println();
+		System.out.println("the selected intendedInteractionList is:"+bestSelection);
+		
+		
+		
+		
+		
+		//action selection问题
+		if(bestSelection == null) {
+			avoidActoinList.clear();
+			avoidActoinList.add(enactedInteraction1.getExperience().getAction());
+			if(multiInteractionList.size() > 0) {
+				for(int g=0;g<multiInteractionList.size();g++) {
+					List<Interaction> tempInteractionListForAvoiding = multiInteractionList.get(g);
+					if(tempInteractionListForAvoiding.size()>1) {
+						if(!avoidActoinList.contains(tempInteractionListForAvoiding.get(1).getExperience().getAction())) {
+							avoidActoinList.add(tempInteractionListForAvoiding.get(1).getExperience().getAction());
+						}
+					}
+				}//for
+			}
+		}
+		System.out.println("avoidActoinList is:"+avoidActoinList);
+		return bestSelection;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	public List<Interaction> reasonningProcess(List<Interaction> enactedInteractionList2, Interaction enactedInteraction1) {
+		System.out.println("reasonningProcess()");
+		List<Interaction> bestSelection = null;
+		
+		int size = enactedInteractionList2.size();
+		List<Integer> indexList = new ArrayList<Integer>();
+		for(int i=0;i<size;i++) {
+			Interaction inter = enactedInteractionList2.get(i);
+			if(inter.equals(enactedInteraction1)) {
+				indexList.add(i);
+			}
+		}
+		
+		List<List<Interaction>> multiInteractionList = new ArrayList<List<Interaction>>();
+		int indexListSize = indexList.size();
+		int index_pre;
+		int index_pos;
+		if(indexListSize>0) {
+			for(int j=0;j<indexListSize;j++) {// [0,4]
+				List<Interaction> interactionSmallList = new ArrayList<Interaction>();
+				index_pre = indexList.get(j);
+				if(j+1 < indexListSize) {
+					index_pos = indexList.get(j+1);
+				}else {
+					index_pos = size;
+				}
+				
+				int maxValenceIndex = 0;
+				boolean isHaveMaxValence = false;
+				for(int k=index_pre;k<index_pos;k++) {
+					if(enactedInteractionList.get(k).getValence() >=  maxValence) {
+						isHaveMaxValence = true;//只有出现了最大值的interaction才会考虑
+						maxValenceIndex = k;
+						break;
+					}
+				}
+				if(isHaveMaxValence) {
+					for(int k=index_pre;k<=maxValenceIndex;k++) {
+						interactionSmallList.add(enactedInteractionList.get(k));
+					}
+					if(!isContainsList(multiInteractionList,interactionSmallList)) {
+						multiInteractionList.add(interactionSmallList);
+					}
+				}
+			}
+		}
+		
+		
+		//得到不同序列的interaction之后要开始学习了
+		//对于下一阶段的学习阶段
+		String multiInteractionListString = "";
+		if(multiInteractionList.size() > 0) {
+			int shortDistance=100;
+			double meanValence = -50;
+			for(int h=0;h<multiInteractionList.size();h++) {
+				int tempTotalValence = 0;
+				
+				
+				//获取备选的一个列表
+				List<Interaction> tempInteractionList = multiInteractionList.get(h);
+				multiInteractionListString = multiInteractionListString+tempInteractionList+"\r\n";
+				int tempSize = tempInteractionList.size();
+				if(tempSize>0) {
+					boolean isHaveMaxValence = false;
+					for(int l=0;l<tempSize;l++) {
+						Interaction inte = tempInteractionList.get(l);
+						//计算均值
+						tempTotalValence+=inte.getValence();
+						if(inte.getValence() >=  maxValence) {
+							isHaveMaxValence = true;//只有出现了最大值的tempInteractionList才会考虑
+						}
+						
+					}
+					System.out.println("tempInteractionList is:"+tempInteractionList);
+					System.out.println("maxValence is:"+maxValence+" isHaveMaxValence is:"+isHaveMaxValence);
+					
+					if(isHaveMaxValence) {
+						double tempMeanValence = (double)tempTotalValence/(double)tempSize;
+						BigDecimal bMeanValence = new BigDecimal(Double.toString(meanValence)); 
+				        BigDecimal bTempMeanValence = new BigDecimal(Double.toString(tempMeanValence)); 
+				        System.out.println("tempTotalValence is:"+tempTotalValence+" tempSize is:"+tempSize+" tempMeanValence is:"+tempMeanValence);
+						if(bMeanValence.compareTo(bTempMeanValence)<0) {
+							if(tempSize<shortDistance) {
+								shortDistance = tempSize;
+								meanValence = tempMeanValence;
+								bestSelection = tempInteractionList;
+							}
+						}
+					}//if isHaveMaxValence
+				}
+			}// end for 备选列表
+			System.out.println("shortDistance is:"+shortDistance+" meanValence is:"+meanValence);
+			System.out.println();
+		}// if multiInteractionList
+		System.out.println("multiInteractionList is:");
+		System.out.println(multiInteractionListString);
+		System.out.println();
+		System.out.println("the selected intendedInteractionList is:"+bestSelection);
+		
+		
+		
+		
+		
+		//action selection问题
+		if(bestSelection == null) {
+			avoidActoinList.clear();
+			avoidActoinList.add(enactedInteraction1.getExperience().getAction());
+			if(multiInteractionList.size() > 0) {
+				for(int g=0;g<multiInteractionList.size();g++) {
+					List<Interaction> tempInteractionListForAvoiding = multiInteractionList.get(g);
+					if(tempInteractionListForAvoiding.size()>1) {
+						if(!avoidActoinList.contains(tempInteractionListForAvoiding.get(1).getExperience().getAction())) {
+							avoidActoinList.add(tempInteractionListForAvoiding.get(1).getExperience().getAction());
+						}
+					}
+				}//for
+			}
+		}
+		System.out.println("avoidActoinList is:"+avoidActoinList);
+		return bestSelection;
+	}
+	
+	
+	
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	public List<Interaction> reasonningProcess(List<Interaction> enactedInteractionList2, Interaction enactedInteraction1) {
+		System.out.println("reasonningProcess()");
+		List<Interaction> bestSelection = null;
+		
+		int size = enactedInteractionList2.size();
+		List<Integer> indexList = new ArrayList<Integer>();
+		for(int i=0;i<size;i++) {
+			Interaction inter = enactedInteractionList2.get(i);
+			if(inter.equals(enactedInteraction1)) {
+				indexList.add(i);
+			}
+		}
+		
+		List<List<Interaction>> multiInteractionList = new ArrayList<List<Interaction>>();
+		int indexListSize = indexList.size();
+		int index_pre;
+		int index_pos;
+		if(indexListSize>0) {
+			for(int j=0;j<indexListSize;j++) {// [0,4]
+				List<Interaction> interactionSmallList = new ArrayList<Interaction>();
+				index_pre = indexList.get(j);
+				if(j+1 < indexListSize) {
+					index_pos = indexList.get(j+1);
+				}else {
+					index_pos = size;
+				}
+				for(int k=index_pre;k<index_pos;k++) {
+					interactionSmallList.add(enactedInteractionList.get(k));
+				}
+				if(!isContainsList(multiInteractionList,interactionSmallList)) {
+					multiInteractionList.add(interactionSmallList);
+				}
+			}
+		}
+		
+		
+		
+		
+		//得到不同序列的interaction之后要开始学习了
+		//对于下一阶段的学习阶段
+		String multiInteractionListString = "";
+		if(multiInteractionList.size() > 0) {
+			int shortDistance=100;
+			double meanValence = 0;
+			for(int h=0;h<multiInteractionList.size();h++) {
+				int tempTotalValence = 0;
+				
+				//获取备选的一个列表
+				List<Interaction> tempInteractionList = multiInteractionList.get(h);
+				multiInteractionListString = multiInteractionListString+tempInteractionList+"\r\n";
+				int tempSize = tempInteractionList.size();
+				if(tempSize>0) {
+					boolean isHaveMaxValence = false;
+					for(int l=0;l<tempSize;l++) {
+						Interaction inte = tempInteractionList.get(l);
+						//计算均值
+						tempTotalValence+=inte.getValence();
+						if(inte.getValence() >=  maxValence) {
+							isHaveMaxValence = true;//只有出现了最大值的tempInteractionList才会考虑
+						}
+						
+					}
+					System.out.println("tempInteractionList is:"+tempInteractionList);
+					System.out.println("maxValence is:"+maxValence+" isHaveMaxValence is:"+isHaveMaxValence);
+					
+					if(isHaveMaxValence) {
+						double tempMeanValence = (double)tempTotalValence/(double)tempSize;
+						BigDecimal bMeanValence = new BigDecimal(Double.toString(meanValence)); 
+				        BigDecimal bTempMeanValence = new BigDecimal(Double.toString(tempMeanValence)); 
+				        System.out.println("tempTotalValence is:"+tempTotalValence+" tempSize is:"+tempSize+" tempMeanValence is:"+tempMeanValence);
+						if(bMeanValence.compareTo(bTempMeanValence)<0) {
+							if(tempSize<shortDistance) {
+								shortDistance = tempSize;
+								meanValence = tempMeanValence;
+								bestSelection = tempInteractionList;
+							}
+						}
+					}//if isHaveMaxValence
+				}
+			}// end for 备选列表
+			System.out.println("shortDistance is:"+shortDistance+" meanValence is:"+meanValence);
+			System.out.println();
+		}// if multiInteractionList
+		System.out.println("multiInteractionList is:");
+		System.out.println(multiInteractionListString);
+		System.out.println();
+		System.out.println("the selected intendedInteractionList is:"+bestSelection);
+		
+		
+		
+		
+		
+		//avoidance action selection 的问题
+		if(bestSelection == null) {
+			//在这种情况下，需要排除之前没有达到valence的actions，在下一次的interaction当中避免这种action
+			avoidActoinList.clear();
+			avoidActoinList.add(enactedInteraction1.getExperience().getAction());
+			if(multiInteractionList.size() > 0) {
+				for(int g=0;g<multiInteractionList.size();g++) {
+					List<Interaction> tempInteractionListForAvoiding = multiInteractionList.get(g);
+					if(tempInteractionListForAvoiding.size()>1) {
+						if(!avoidActoinList.contains(tempInteractionListForAvoiding.get(1).getExperience().getAction())) {
+							avoidActoinList.add(tempInteractionListForAvoiding.get(1).getExperience().getAction());
+						}
+					}
+				}//for
+			}
+		}
+		System.out.println("avoidActoinList is:"+avoidActoinList);
+		return bestSelection;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	public List<Interaction> reasonningProcess(List<Interaction> enactedInteractionList2, Interaction enactedInteraction1) {
+		System.out.println();
+		System.out.println("reasonningProcess()");
+		List<Interaction> bestSelection = null;
+		
+		int size = enactedInteractionList2.size();
+		List<Integer> indexList = new ArrayList<Integer>();
+		for(int i=0;i<size;i++) {
+			Interaction inter = enactedInteractionList2.get(i);
+			if(inter.equals(enactedInteraction1)) {
+				indexList.add(i);
+			}
+		}
+		
+		
+		//取这些关键index之间的interactions
+		List<List<Interaction>> multiInteractionList = new ArrayList<List<Interaction>>();
+		int indexListSize = indexList.size();
+		int index_pre;
+		int index_pos;
+		if(indexListSize>0) {
+			for(int j=0;j<indexListSize;j++) {// [0,4]
+				List<Interaction> interactionSmallList = new ArrayList<Interaction>();
+				index_pre = indexList.get(j);
+				if(j+1 < indexListSize) {
+					index_pos = indexList.get(j+1);
+				}else {
+					index_pos = size;
+				}
+				
+				int maxValenceIndex = 0;
+				boolean isHaveMaxValence = false;
+				for(int k=index_pre;k<index_pos;k++) {
+					if(enactedInteractionList.get(k).getValence() >=  maxValence) {
+						isHaveMaxValence = true;
+						maxValenceIndex = k;
+						break;
+					}
+				}
+				
+				if(isHaveMaxValence) {
+					for(int k=index_pre;k<=maxValenceIndex;k++) {
+						interactionSmallList.add(enactedInteractionList.get(k));
+					}
+					if(!isContainsList(multiInteractionList,interactionSmallList)) {
+						multiInteractionList.add(interactionSmallList);
+					}
+				}
+				
+				
+			}
+		}
+		
+		
+		
+		
+		//得到不同序列的interaction之后要开始学习了
+		//对于下一阶段的学习阶段
+		String multiInteractionListString = "";
+		if(multiInteractionList.size() > 0) {
+			int shortDistance=100;
+			double meanValence = -100;
+			for(int h=0;h<multiInteractionList.size();h++) {
+				int tempTotalValence = 0;
+				
+				//获取备选的一个列表
+				List<Interaction> tempInteractionList = multiInteractionList.get(h);
+				multiInteractionListString = multiInteractionListString+tempInteractionList+"\r\n";
+				int tempSize = tempInteractionList.size();
+				if(tempSize>0) {
+					boolean isHaveMaxValence = false;
+					for(int l=0;l<tempSize;l++) {
+						Interaction inte = tempInteractionList.get(l);
+						//计算均值
+						tempTotalValence+=inte.getValence();
+						if(inte.getValence() >=  maxValence) {
+							isHaveMaxValence = true;//只有出现了最大值的tempInteractionList才会考虑
+						}
+						
+					}
+					System.out.println("tempInteractionList is:"+tempInteractionList);
+					System.out.println("maxValence is:"+maxValence+" isHaveMaxValence is:"+isHaveMaxValence);
+					
+					if(isHaveMaxValence) {
+						double tempMeanValence = (double)tempTotalValence/(double)tempSize;
+						BigDecimal bMeanValence = new BigDecimal(Double.toString(meanValence)); 
+				        BigDecimal bTempMeanValence = new BigDecimal(Double.toString(tempMeanValence)); 
+				        System.out.println("tempTotalValence is:"+tempTotalValence+" tempSize is:"+tempSize+" tempMeanValence is:"+tempMeanValence);
+						if(bMeanValence.compareTo(bTempMeanValence)<0) {
+							if(tempSize<shortDistance) {
+								shortDistance = tempSize;
+								meanValence = tempMeanValence;
+								bestSelection = tempInteractionList;
+							}
+						}
+					}//if isHaveMaxValence
+				}
+			}// end for 备选列表
+			System.out.println("shortDistance is:"+shortDistance+" meanValence is:"+meanValence);
+			System.out.println();
+		}// if multiInteractionList
+		System.out.println("multiInteractionList is:");
+		System.out.println(multiInteractionListString);
+		System.out.println();
+		System.out.println("the selected intendedInteractionList is:"+bestSelection);
+		
+		
+		
+		
+		
+		//avoidance action selection 的问题
+		if(bestSelection == null) {
+			//在这种情况下，需要排除之前没有达到valence的actions，在下一次的interaction当中避免这种action
+			avoidActoinList.clear();
+			avoidActoinList.add(enactedInteraction1.getExperience().getAction());
+			if(multiInteractionList.size() > 0) {
+				for(int g=0;g<multiInteractionList.size();g++) {
+					List<Interaction> tempInteractionListForAvoiding = multiInteractionList.get(g);
+					if(tempInteractionListForAvoiding.size()>1) {
+						if(!avoidActoinList.contains(tempInteractionListForAvoiding.get(1).getExperience().getAction())) {
+							avoidActoinList.add(tempInteractionListForAvoiding.get(1).getExperience().getAction());
+						}
+					}
+				}//for
+			}
+		}
+		System.out.println("avoidActoinList is:"+avoidActoinList);
+		return bestSelection;
+	}

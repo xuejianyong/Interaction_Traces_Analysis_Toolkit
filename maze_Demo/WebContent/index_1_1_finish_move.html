@@ -1,0 +1,284 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script src="myScript.js"></script>
+<script>
+var xcenter = 0;
+var ycenter = 0;
+var interval = 0;
+var rate = 10;
+var direction = "";
+var innerDist = 0;
+var goFoward = true;
+
+document.onkeydown=function(event){
+	var e = event || window.event || arguments.callee.caller.arguments[0];
+	//alert(e.keyCode);
+	
+	if(e && e.keyCode==37){//left
+		if(direction == "left"){ 
+			if(!isBoundary(xcenter,ycenter,interval,"left")){
+				clearCurrent(xcenter,ycenter,innerDist);
+				xcenter -= interval;
+				direction = "left";
+				goFoward = true;
+				arrowDraw(xcenter,ycenter,innerDist,direction);
+				drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			}else{
+				goFoward = false;
+				drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			}
+		}else{//if the direction is not the same, change the direction first.
+			direction = "left";
+			clearCurrent(xcenter,ycenter,innerDist);
+			arrowDraw(xcenter,ycenter,innerDist,direction);
+		}
+	}if(e && e.keyCode==38){//up
+		//alert(xcenter+","+ycenter);
+		if(direction == "up"){
+			if(!isBoundary(xcenter,ycenter,interval,"up")){
+				clearCurrent(xcenter,ycenter,innerDist);
+				ycenter -= interval;
+				direction = "up";
+				goFoward = true;
+				arrowDraw(xcenter,ycenter,innerDist,direction);
+				drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			}else{
+				//alert("you arrived the boundary of the evironment");
+				goFoward = false;
+				drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			}
+		}else{//if the direction is not the same, change the direction first.
+			direction = "up";
+			clearCurrent(xcenter,ycenter,innerDist);
+			arrowDraw(xcenter,ycenter,innerDist,direction);
+		}
+		
+	}if(e && e.keyCode==39){//right
+		if(direction == "right"){
+			if(!isBoundary(xcenter,ycenter,interval,"right")){
+				clearCurrent(xcenter,ycenter,innerDist);
+				xcenter += interval;
+				direction = "right";
+				goFoward = true;
+				arrowDraw(xcenter,ycenter,innerDist,direction);
+				drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			}else{
+				//alert("you arrived the boundary of the evironment");
+				goFoward = false;
+				drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			}
+		}else{//if the direction is not the same, change the direction first.
+			direction = "right";
+			clearCurrent(xcenter,ycenter,innerDist);
+			arrowDraw(xcenter,ycenter,innerDist,direction);
+		}
+	}if(e && e.keyCode==40){//down
+		if(direction == "down"){
+			if(!isBoundary(xcenter,ycenter,interval,"down")){
+				clearCurrent(xcenter,ycenter,innerDist);
+				ycenter += interval;
+				direction = "down";
+				goFoward = true;
+				arrowDraw(xcenter,ycenter,innerDist,direction);
+				drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			}else{
+				//alert("you arrived the boundary of the evironment");
+				goFoward = false;
+				drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			}
+		}else{//if the direction is not the same, change the direction first.
+			direction = "down";
+			clearCurrent(xcenter,ycenter,innerDist);
+			arrowDraw(xcenter,ycenter,innerDist,direction);
+		}
+	}
+}; 
+
+function drawForward(xcenter,ycenter,innerDist,direction,goFoward){
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	//alert("the next step coordinates are:"+xcenter+","+(ycenter-interval));
+	if(goFoward){
+		ctx.fillStyle = "#3F0";
+	}else{//there is a wall in the front
+		ctx.fillStyle = "#F00";
+	}
+	switch(direction){
+	case "left":
+		ctx.fillRect(xcenter-innerDist,ycenter-innerDist/2,innerDist/2,innerDist);break;
+	case "up":
+		ctx.fillRect(xcenter-innerDist/2,ycenter-innerDist,innerDist,innerDist/2);break;
+	case "right":
+		ctx.fillRect(xcenter+innerDist/2,ycenter-innerDist/2,innerDist/2,innerDist);break;
+	case "down":
+		ctx.fillRect(xcenter-innerDist/2,ycenter+innerDist/2,innerDist,innerDist/2);break;
+	}
+}
+
+function isBoundary(xcenter,ycenter,interval,direction){
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	
+	var isBoundary = false;
+	var nextPosX = 0;
+	var nextPosY = 0;
+	
+	switch(direction){
+	case "left":
+		nextPosX = xcenter - interval;
+		nextPosY = ycenter;
+		break;
+	case "up":
+		nextPosX = xcenter;
+		nextPosY = ycenter - interval;
+		break;
+	case "right":
+		nextPosX = xcenter + interval;
+		nextPosY = ycenter;
+		break;
+	case "down":
+		nextPosX = xcenter;
+		nextPosY = ycenter + interval;
+		break;
+	}
+	
+	var colors = ctx.getImageData(nextPosX, nextPosY, 1, 1).data;
+	//alert(nextPosX, nextPosY);
+	//alert(ctx.getImageData(nextPosX, nextPosY, 1, 1).data);
+	//alert("25, 25");
+	//alert(ctx.getImageData(25, 25, 1, 1).data);
+	var red=colors[0];
+	var green=colors[1];
+	var blue=colors[2];
+	if(red==0 && green==255 && blue==153){
+		isBoundary = true;
+	}
+	return isBoundary;
+}
+
+function initialMaze(){
+	var c=document.getElementById("myCanvas");
+	var width = parseInt(c.getAttribute("width"));
+	var height = parseInt(c.getAttribute("height"));
+	interval = width/rate;
+	innerDist = interval/2;
+	xcenter = interval + innerDist;
+	ycenter = interval + innerDist;
+	
+	var ctx=c.getContext("2d");
+	ctx.fillStyle = "#0F9";
+	ctx.fillRect(0,0,interval,height);//left |
+	ctx.fillRect(0,0,width,interval);// up -
+	ctx.fillRect(width-interval,0,width,height);//right |
+	ctx.fillRect(0,height-interval,width,height);//down -
+	ctx.fillRect(interval*3,interval*3,width-interval*6,height-interval*6);//center map
+	
+	direction= "up";
+	arrowDraw(xcenter,ycenter,innerDist,direction);
+	
+}
+
+function clearCurrent(xcenter,ycenter,innerDist){
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+ 	ctx.clearRect(xcenter-innerDist,ycenter-innerDist,interval,interval);
+}
+
+function arrowDraw(xcenter,ycenter,innerDist,direction){
+	//alert("enter the arrowDraw function");
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	ctx.fillStyle = "#30F";
+	ctx.beginPath();
+	switch(direction){
+	case "up":
+		ctx.moveTo(xcenter,ycenter-innerDist);
+		ctx.lineTo(xcenter-innerDist,ycenter+innerDist);
+		ctx.lineTo(xcenter, ycenter+innerDist/2);
+		ctx.lineTo(xcenter+innerDist, ycenter+innerDist);
+		break;
+	case "down":
+		ctx.moveTo(xcenter,ycenter+innerDist);
+		ctx.lineTo(xcenter-innerDist,ycenter-innerDist);
+		ctx.lineTo(xcenter,ycenter-innerDist/2);
+		ctx.lineTo(xcenter+innerDist,ycenter-innerDist);
+		break;
+	case "left":
+		ctx.moveTo(xcenter-innerDist,ycenter);
+		ctx.lineTo(xcenter+innerDist,ycenter-innerDist);
+		ctx.lineTo(xcenter+innerDist/2,ycenter);
+		ctx.lineTo(xcenter+innerDist,ycenter+innerDist);
+		break;
+	case "right":
+		
+		ctx.moveTo(xcenter+innerDist,ycenter);
+		ctx.lineTo(xcenter-innerDist,ycenter-innerDist);
+		ctx.lineTo(xcenter-innerDist/2,ycenter);
+		ctx.lineTo(xcenter-innerDist,ycenter+innerDist);
+		break;
+	}
+	ctx.closePath();
+	ctx.fill();
+}
+
+function loadXMLDoc(){
+	var xmlhttp;
+	if (window.XMLHttpRequest)
+	{
+		//  IE7+, Firefox, Chrome, Opera, Safari 浏览器执行代码
+		xmlhttp=new XMLHttpRequest();
+	}
+	else{
+		// IE6, IE5 浏览器执行代码
+		xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	xmlhttp.onreadystatechange=function(){
+		if (xmlhttp.readyState==4 && xmlhttp.status==200){
+			document.getElementById("myDiv").innerHTML=xmlhttp.responseText;
+		}
+	}
+	xmlhttp.open("GET","/try/ajax/ajax_info.txt",true);
+	xmlhttp.send();
+}
+
+function start(){
+	alert("adfaddfa");
+}
+
+</script>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Hierarchical sequential learning</title>
+<style type="text/css">
+.test {
+	text-align: center;
+}
+.canvas {
+	text-align: center;
+}
+.canvas p {
+	font-family: Arial, Helvetica, sans-serif;
+}
+</style>
+</head>
+
+<body class="canvas" onload="initialMaze();">
+
+<p>&nbsp;</p>
+<p>
+  <canvas id="myCanvas" width="500" height="500" ></canvas>
+</p>
+<p>Experiment 1. An agent-environment interactive environment for interacting.</p>
+<p>Hierarchical sequential learning with intrinsic motivation </p>
+<p>with lazy learning for knowledge transfer</p>
+<p><button type="button" onclick="start()">START</button></p>
+<div id="myDiv"><h2>Using the methods submit the interactions</h2></div>
+<button type="button" onclick="loadXMLDoc()">Edit the content</button>
+<p>&nbsp;</p>
+<p class="test">adfdasfdffad</p>
+
+https://www.youtube.com/watch?v=LVZ0cPpmSu8
+point1. color could be used to identify this learning process.
+
+</body>
+</html>

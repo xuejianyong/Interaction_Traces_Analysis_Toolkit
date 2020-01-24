@@ -1,0 +1,933 @@
+package dl;
+
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+
+/**
+ * Servlet implementation class DlServlet
+ */
+@WebServlet("/DlServlet")
+public class DlServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	
+	/*public int env[][] = {
+			{1,1,1,1,1,1,1,1,1,1},
+			{1,0,0,0,0,0,0,0,0,1},
+			{1,0,1,1,1,1,1,1,0,1},
+			{1,0,1,1,1,1,1,1,0,1},
+			{1,0,1,1,1,1,1,1,0,1},
+			{1,0,1,1,1,1,1,1,0,1},
+			{1,0,1,1,1,1,1,1,0,1},
+			{1,0,1,1,1,1,1,1,0,1},
+			{1,0,0,0,0,0,0,0,0,1},
+			{1,1,1,1,1,1,1,1,1,1}};*/
+	
+	public int env[][] = {
+			{1,1,1,1,1,1,1,1,1,1},
+			{1,0,0,0,0,0,0,0,1,1},
+			{1,0,1,1,1,1,1,0,0,1},
+			{1,0,1,1,1,1,1,1,0,1},
+			{1,0,1,1,1,1,1,1,0,1},
+			{1,0,1,1,1,1,1,1,0,1},
+			{1,0,1,1,1,1,1,1,0,1},
+			{1,0,0,1,1,1,1,1,0,1},
+			{1,1,0,0,0,0,0,0,0,1},
+			{1,1,1,1,1,1,1,1,1,1}};
+	
+	public String isInitialState = "";
+	public String direction = "";
+	public int v_moveSucess = 0;
+	public int v_moveFailture = 0;
+	public int v_turn = 0;
+	public int v_feelEmpty = 0;
+	public int v_feelWall = 0;
+	
+	public Position randomPosition;
+	public List<Position> positionList = new ArrayList<Position>();
+	public String[] directions = {"up","right","down","left"};
+	public enum Mood {SELF_SATISFIED, FRUSTRATED, BORED, PAINED, PLEASED};
+	public Mood mood;
+	Random random = new Random();
+	
+	public Map<String ,Experience> EXPERIENCES = new HashMap<String ,Experience>();
+	public Map<String , Interaction> INTERACTIONS = new HashMap<String , Interaction>() ;
+	public Interaction enactedInteraction;
+	public Interaction intendedInteraction;
+	public Interaction superInteraction;
+	
+	public List<Interaction> enactedInteractionList = new ArrayList<Interaction>();
+	public List<Interaction> novelEnactedInteractionList = new ArrayList<Interaction>();
+	public boolean isNovel = false;
+	
+	public String resultString = "";
+	public int lamda = 6;
+	public int loopNum = 0;
+	public int threshold = 3;
+	public List<Interaction> satisfyList = new ArrayList<Interaction>();
+	public List<Integer> actionList = new ArrayList<Integer>();
+	public Map<Integer,Integer> actionMap = new HashMap<Integer,Integer>();
+	public List<Integer> intendedInteractionActionList = new ArrayList<Integer>();
+	public List<Integer> avoidActoinList = new ArrayList<Integer>();
+	public List<Problem> problemList = new ArrayList<Problem>();
+	public int contextScope = 2;
+	public List<AvoidInteraction> aiList = new ArrayList<AvoidInteraction>();
+	public boolean isPrimitiveInteraction = false;
+	public boolean isCurrentMiniValence = false;
+	
+	
+	
+	public String beliefState = "unknown";
+	public List<Interaction> beliefInteractionList =new ArrayList<Interaction>();
+	public List<Interaction> sporadicInteractionList = new ArrayList<Interaction>();
+	public boolean isCheck = false;
+
+	public int maxValence = 0;
+	public int minValence = 0;
+	public boolean isMaxValence = false;
+	public boolean isMinValence = false;
+	public List<Interaction> intendedInteractionList = null;
+	public boolean isCheckList = false;
+	public int sequenceIndex = 1;
+	
+	public int totalValence = 0;
+	
+	
+	public String isReady = "";
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+	/*
+    public DlServlet() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+    */
+
+	public Interaction getEnactedInteraction() {
+		return enactedInteraction;
+	}
+
+	public Mood getMood() {
+		return mood;
+	}
+
+	public void setMood(Mood mood) {
+		this.mood = mood;
+	}
+
+	public Interaction getIntendedInteraction() {
+		return intendedInteraction;
+	}
+
+	public void setIntendedInteraction(Interaction intendedInteraction) {
+		this.intendedInteraction = intendedInteraction;
+	}
+
+	public Interaction getSuperInteraction() {
+		return superInteraction;
+	}
+
+	public void setSuperInteraction(Interaction superInteraction) {
+		this.superInteraction = superInteraction;
+	}
+
+	public void setEnactedInteraction(Interaction enactedInteraction) {
+		this.enactedInteraction = enactedInteraction;
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		System.out.println("-------------------------------------------------------------------------");
+		isInitialState = request.getParameter("isInitialState");
+		resultString = request.getParameter("resultString");
+		//System.out.println("isInitialState:"+isInitialState+" resultString:"+resultString);
+		if(isInitialState.equals("yes")) {
+			isReady = "ok";
+			randomPosition = getInitialPosition();////////////////////////////////////////////////////////////////
+			direction = randomPosition.getDirection();////////////////////////////////////////////////////////////
+			JSONObject jsonObject = new JSONObject();
+			try {
+				jsonObject.put("coordiX",randomPosition.getPointX());
+				jsonObject.put("coordiY", randomPosition.getPointY());
+				jsonObject.put("direction", direction);
+				jsonObject.put("isInitialState", "no");
+				jsonObject.put("totalValence",totalValence);
+				jsonObject.put("isReady",isReady);
+				
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			response.getWriter().write(jsonObject.toString());
+		}else {//not the initialization process
+			//The first interaction
+			if(resultString.equals("")) {//The intended process
+				//the valence initialization work
+				System.out.println("The values initialization process.......");
+				v_moveSucess = Integer.parseInt(request.getParameter("v_move_forward"));
+				v_moveFailture = Integer.parseInt(request.getParameter("v_bump"));
+				v_turn = Integer.parseInt(request.getParameter("v_turn"));
+				v_feelEmpty = Integer.parseInt(request.getParameter("v_feel_empty"));
+				v_feelWall = Integer.parseInt(request.getParameter("v_feel_wall"));
+				System.out.println("parameters are{v_moveSucess:"+v_moveSucess+" v_moveFailture:"
+						+ ""+v_moveFailture+" v_turn:"+v_turn+" v_feelEmpty:"+v_feelEmpty+" v_feelWall:"+v_feelWall);
+				
+				Experience e0 = addOrGetExperience("e0",0);e0.resetAbstract();//move forward  1:sucess,0:fail
+				Experience e1 = addOrGetExperience("e1",1);e1.resetAbstract();//turn left
+				Experience e2 = addOrGetExperience("e2",2);e2.resetAbstract();//turn right
+				Experience e3 = addOrGetExperience("e3",3);e3.resetAbstract();//feel front    0:feel empy,1:feel wall
+				Experience e4 = addOrGetExperience("e4",4);e4.resetAbstract();//feel left     0:feel empy,1:feel wall
+				Experience e5 = addOrGetExperience("e5",5);e5.resetAbstract();//feel right    0:feel empy,1:feel wall
+				
+				Interaction i01 = addOrGetPrimitiveInteraction(e0, 1, v_moveSucess);
+				Interaction i00 = addOrGetPrimitiveInteraction(e0, 0, v_moveFailture);
+				Interaction i11 = addOrGetPrimitiveInteraction(e1, 1, v_turn);
+				Interaction i21 = addOrGetPrimitiveInteraction(e2, 1, v_turn);
+				Interaction i31 = addOrGetPrimitiveInteraction(e3, 1, v_feelEmpty);
+				Interaction i30 = addOrGetPrimitiveInteraction(e3, 0, v_feelWall);
+				Interaction i41 = addOrGetPrimitiveInteraction(e4, 1, v_feelEmpty);
+				Interaction i40 = addOrGetPrimitiveInteraction(e4, 0, v_feelWall);
+				Interaction i51 = addOrGetPrimitiveInteraction(e5, 1, v_feelEmpty);
+				Interaction i50 = addOrGetPrimitiveInteraction(e5, 0, v_feelWall);
+				
+				//action, visited times
+				actionMap.put(0, 0);
+				actionMap.put(1, 0);
+				actionMap.put(2, 0);
+				actionMap.put(3, 0);
+				actionMap.put(4, 0);
+				actionMap.put(5, 0);
+				
+				System.out.println("The first interaction...");
+				List<Anticipation> anticipations = anticipate();
+				intendedInteraction = selectInteraction(anticipations);
+				isPrimitiveInteraction = true;
+				
+				
+				int actionType = intendedInteraction.getExperience().getAction();
+				if(!actionList.contains(actionType)) {
+					actionList.add(actionType);
+				}
+				isReady = "ok";
+				JSONObject jsonObject = new JSONObject();
+				try {
+					jsonObject.put("actionType",actionType);
+					jsonObject.put("resultString",resultString);
+					jsonObject.put("totalValence",totalValence);
+					jsonObject.put("isReady",isReady);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				response.getWriter().write(jsonObject.toString());
+			}else {// 后续的交互
+				
+				
+				//interaction序号
+				System.out.println("****************************************************************************");
+				System.out.println("loop number is:"+loopNum);
+				loopNum++;
+				//获取交互结果
+				System.out.println("intendedInteraction is:"+intendedInteraction);
+				int result;
+				if(resultString.equals("yes"))result = 0;
+				else result = 1;
+				resultString = "";
+				Interaction enactedInteraction1 = addOrGetPrimitiveInteraction(intendedInteraction.getExperience(),result,0);
+				System.out.println("enactedInteraction is:"+enactedInteraction1);
+				
+				
+				//交互结果的valence信息，这也是交互历史的比较
+				if(enactedInteraction1.getValence() > maxValence) {
+					maxValence = enactedInteraction1.getValence();
+					isMaxValence = true;
+					System.out.println("The current interaction gets the maximum valence");
+				}
+				if(enactedInteraction1.getValence() < minValence) {
+					minValence = enactedInteraction1.getValence();
+					isCurrentMiniValence = true;
+					System.out.println("The current interaction gets the minimum valence");
+				}
+				totalValence=totalValence+enactedInteraction1.getValence();
+				
+				
+				
+				if(!novelEnactedInteractionList.contains(enactedInteraction1)) {
+					isNovel = true;
+					novelEnactedInteractionList.add(enactedInteraction1);
+				}else {
+					isNovel = false;
+				}
+				
+				
+				
+				if(!isPrimitiveInteraction) {//用来标记比较intended interaction与enacted interaction
+					if(enactedInteraction1.equals(intendedInteraction)) {
+						/*********************************************************************************/
+					}else {
+						/*********************************************************************************/
+					}
+				}
+				
+				
+				//enactedinteraction 组合过程，同时也记录了composite interaction的weight
+				//learnCompositeInteraction(enactedInteraction1);
+				
+				
+				
+				
+				/*
+				intendedInteractionList = reasonningProcess(enactedInteractionList,enactedInteraction1);
+				if(intendedInteractionList == null) {
+					intendedInteraction = selectOtherInteraction(enactedInteraction1,1);
+					//isCheckList = false;
+				}else {
+					intendedInteraction = intendedInteractionList.get(1);
+				}*/
+				
+				
+				
+				/*********************************************************************************/
+				//reasoning,从交互结果中学习，调整架构，并且为下一次交互服务
+				//这里主要是为了区分按照链来执行exploitation的过程，还是exploration的过程
+				//这里的check是为了完成验证一个list的工作。如果产生一个比较好的check list那么需要验证。
+				//如果不是一个checklist，即为另外找到的一个intended interaction那么直接执行，没有必要进行验证list。
+				if(!isCheckList) {//exploration的过程，不去执行链，也不用去比较intended interaction 与 enacted interaction
+					intendedInteractionList = checkProcess(enactedInteractionList,enactedInteraction1);
+					//获得要执行的链，然后就链中不合适的interaction进行修正。最终获得比较优化的链。
+					if(intendedInteractionList == null) {
+						System.out.println("The intendedInteractionList is null");
+						intendedInteraction = selectOtherInteraction(enactedInteraction1,1);
+						isCheckList = false;
+					}else {
+						//开始检验链
+						int intendedListSize = intendedInteractionList.size();
+						if(intendedListSize>0) {
+							if(intendedListSize ==1) {
+								intendedInteraction = intendedInteractionList.get(0);//enactedInteraction1
+							}else {
+								sequenceIndex = 1;
+								intendedInteraction = intendedInteractionList.get(sequenceIndex);
+								intendedInteractionActionList.clear();
+								intendedInteractionActionList.add(intendedInteraction.getExperience().getAction());
+								//sequenceIndex++;
+							}
+							isCheckList = true;//找到了一个完整的list，然后开始进入检验的过程。
+						}
+					}
+					System.out.println("isCheckList is:"+isCheckList);
+				}else {// 进入intendedInteractionList当中逐一验证执行
+					int intendedListSize1 = intendedInteractionList.size();
+					int tempSequenceIndex = sequenceIndex+1;
+					if(intendedListSize1 == 1) {
+						if(enactedInteraction1.equals(intendedInteraction)) {
+							intendedInteraction = enactedInteraction1;
+						}else {
+							intendedInteractionList = checkProcess(enactedInteractionList,enactedInteraction1);
+							if(intendedInteractionList == null) {
+								intendedInteraction = selectOtherInteraction(enactedInteraction1,2);
+								isCheckList = false;
+							}else {
+								int intendedListSize = intendedInteractionList.size();
+								if(intendedListSize>0) {
+									if(intendedListSize ==1) {
+										intendedInteraction = intendedInteractionList.get(0);//enactedInteraction1
+									}else {
+										sequenceIndex = 1;
+										intendedInteraction = intendedInteractionList.get(sequenceIndex);
+										intendedInteractionActionList.clear();
+										intendedInteractionActionList.add(intendedInteraction.getExperience().getAction());
+									}
+									isCheckList = true;
+								}
+							}
+						}
+					}else {// intendedInteractionList size >1
+						System.out.println("Verifing the intendedInteractionList one by one.");
+						if(enactedInteraction1.equals(intendedInteraction)) {
+							if(tempSequenceIndex < intendedListSize1) {
+								sequenceIndex++;
+								intendedInteraction = intendedInteractionList.get(sequenceIndex);
+								/*
+								System.out.println("Check the problem interaction list with current intended interaction list");
+								if(problemList.size() >0) {
+									for(int k=0;k<problemList.size();k++) {
+										Problem pb = problemList.get(k);
+										if(pb.getEnactedInteraction().equals(intendedInteractionList.get(0))) {
+											if(sequenceIndex<pb.getProblemInteractionList().size()) {
+												intendedInteraction = intendedInteractionList.get(sequenceIndex);
+											}else {
+												intendedInteraction = selectOtherInteraction(pb.getProblemInteractionList().get(sequenceIndex-1),3);
+											}
+										}
+									}
+								}else {
+									intendedInteraction = intendedInteractionList.get(sequenceIndex);
+								}*/
+								if(!intendedInteractionActionList.contains(intendedInteraction.getExperience().getAction()))
+									intendedInteractionActionList.add(intendedInteraction.getExperience().getAction());
+							}else{//验证完毕，没有问题的情况
+								System.out.println("finish the full sequence of the intended interaction list");
+								intendedInteractionActionList.clear();
+								intendedInteractionList = checkProcess(enactedInteractionList,enactedInteraction1);
+								if(intendedInteractionList == null) {
+									intendedInteraction = selectOtherInteraction(enactedInteraction1,4);
+									isCheckList = false;
+								}else {
+									int intendedListSize = intendedInteractionList.size();
+									if(intendedListSize>0) {
+										if(intendedListSize ==1) {
+											intendedInteraction = intendedInteractionList.get(0);//enactedInteraction1
+										}else {
+											/*********************************************************************************/
+											if(!intendedInteractionActionList.contains(enactedInteraction1.getExperience().getAction())) {
+												intendedInteractionActionList.add(enactedInteraction1.getExperience().getAction());
+											}
+											sequenceIndex = 1;
+											intendedInteraction = intendedInteractionList.get(sequenceIndex);
+											intendedInteractionActionList.add(intendedInteraction.getExperience().getAction());
+										}
+										isCheckList = true;
+									}
+								}
+							}
+						}else {//intendedItneractionList 当中 interaction不相等，即为验证过程当中有问题
+							System.out.println("Following the intended interaction list, but there is something not right");
+							/*
+							System.out.println("Create a problem list for class problem");
+							List<Interaction> problemTempList = new ArrayList<Interaction>();
+							for(int z=1;z<=sequenceIndex;z++) {
+								problemTempList.add(intendedInteractionList.get(z));
+							}
+							if(!isInContainlList(problemList,enactedInteraction1,problemTempList)) {//没有这个enacted interaction
+								Problem problem = new Problem();
+								problem.setEnactedInteraction(enactedInteraction1);
+								problem.setProblemInteractionList(problemTempList);
+								problem.incrementWrongNumber();
+								problemList.add(problem);
+							}else {
+								for(Problem pb:problemList) {
+									if(pb.getEnactedInteraction().equals(enactedInteraction1)) {
+										pb.incrementWrongNumber();
+									}
+								}
+							}
+							*/
+							System.out.println("intendedInteractionActionList is:"+intendedInteractionActionList);
+							intendedInteraction = selectOtherIntendedInteraction(intendedInteractionActionList);
+							//intendedInteraction = selectOtherInteraction(enactedInteraction1,5);
+							intendedInteractionActionList.clear();
+							isCheckList = false;
+						}
+					}//size > 1 的情况
+				}//执行intendedInteractionList逐一验证interaction
+				
+				String problemString = "";
+				for(int z=0;z<problemList.size();z++) {
+					problemString = problemString +problemList.get(z).toString()+"\r\n";
+				}
+				System.out.println("problemList is:"+problemString);
+				
+				
+				
+				//finishing processing
+				this.setEnactedInteraction(enactedInteraction1);
+				enactedInteractionList.add(enactedInteraction1);
+				if (enactedInteraction1.getValence() >= 0) {
+					this.setMood(Mood.PLEASED);
+				}else {
+					this.setMood(Mood.PAINED);
+				}
+				
+				
+				
+				//老版本的下一个交互进行方式
+				//List<Anticipation> anticipations = anticipate();
+				//intendedInteraction = selectInteraction(anticipations);
+				
+				
+				
+				isReady = "ok";
+				int actionType = intendedInteraction.getExperience().getAction();
+				if(!actionList.contains(actionType)) {
+					actionList.add(actionType);
+				}
+				JSONObject jsonObject = new JSONObject();  //创建Json对象
+				try {
+					jsonObject.put("actionType",actionType);
+					jsonObject.put("resultString",resultString);
+					jsonObject.put("totalValence",totalValence);
+					jsonObject.put("loopNum",loopNum);
+					jsonObject.put("isReady",isReady);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				response.getWriter().write(jsonObject.toString());
+			}//the following interactions
+		}//interaction
+	}
+	
+	public Interaction selectOtherIntendedInteraction(List<Integer> intendedInteractionActionList) {
+		Interaction interaction = null;
+		for(Interaction inter: INTERACTIONS.values()) {
+			if(inter.isPrimitive()) {
+				if(!intendedInteractionActionList.contains(inter.getExperience().getAction())){
+					interaction = inter;
+				}
+			}
+		}
+		return interaction;
+	}
+	
+	public boolean isEqualList(List<Interaction> list1,List<Interaction> list2) {
+		boolean isEqual = true;
+		if(list1.size() != list2.size()) {
+			isEqual = false;
+		}else {
+			for(int y=0; y<list1.size();y++) {
+				if(!list1.get(y).equals(list2.get(y))) {
+					isEqual = false;
+				}
+			}
+		}
+		return isEqual;
+	}
+	
+	
+	public boolean isInContainlList(List<Problem> problemList,Interaction enactedInteraction1, List<Interaction> list2) {
+		boolean isInContainlList = false;
+		if(problemList.size() > 0) {
+			for(int w=0;w<problemList.size();w++) {
+				Problem pb = problemList.get(w);
+				if(pb.getEnactedInteraction().equals(enactedInteraction1)) {
+					List<Interaction> list1 = pb.getProblemInteractionList();
+					if(isEqualList(list1,list2)) {
+						isInContainlList = true;
+					}
+				}
+			}
+		}
+		return isInContainlList;
+	}
+	
+	public Interaction selectOtherInteraction(Interaction enactedInteraction,int index) {
+		System.out.println();
+		System.out.println("Select other interaction with different action "+index);
+		Interaction interaction = null;
+		
+		//记录action的执行次数
+		int actionType1 = enactedInteraction.getExperience().getAction();
+		int triedTimes = actionMap.get(actionType1);
+		actionMap.put(actionType1, triedTimes+1);
+		
+		
+		List<Integer> intList = new ArrayList<Integer>();
+		intList.add(0);
+		intList.add(1);
+		intList.add(2);
+		intList.add(3);
+		intList.add(4);
+		intList.add(5);
+		
+		System.out.println("avoidActoinList is:"+avoidActoinList);
+		if(avoidActoinList.size() ==6) {
+			intList.remove(enactedInteraction.getExperience().getAction());
+		}else {
+			intList.removeAll(avoidActoinList);
+		}
+		
+		int randomIndex = random.nextInt(intList.size());
+		for(Interaction inter: INTERACTIONS.values()) {
+			if(inter.isPrimitive()) {
+				if(inter.getExperience().getAction() == intList.get(randomIndex)){
+					interaction = inter;
+				}
+			}
+		}
+		avoidActoinList.clear();
+		
+		/*
+		for(Interaction inter: INTERACTIONS.values()) {
+			if(inter.isPrimitive()) {
+				if(inter.getExperience().getAction() != enactedInteraction.getExperience().getAction()){
+					interaction = inter;
+				}
+			}
+		}
+		*/
+		
+		System.out.println("the selected interaction is:"+interaction);
+		return interaction;
+	}
+	
+	public boolean isAllVisited() {
+		boolean isAll = true;
+		for(Interaction interaction: INTERACTIONS.values()) {
+			if(interaction.isPrimitive()) {
+				if(!interaction.isVisited)isAll = false;
+			}
+		}
+		return isAll;
+	}
+
+	public List<Interaction> checkProcess(List<Interaction> enactedInteractionList2, Interaction enactedInteraction1) {
+		//With the entire searching process for each recursion，当enactedInteractionList2的size足够大的时候，
+		//之前很久的交互也会进行处理，这是不合理的
+		//这块存在的问题比较多，也是需要集中思考的地方。
+		System.out.println();
+		System.out.println("checkProcess()");
+		
+		List<Interaction> bestSelection = null;
+		int size = enactedInteractionList2.size();
+		List<Integer> indexList = new ArrayList<Integer>();
+		
+		if(size>0) {
+			for(int i=0;i<size;i++) {
+				Interaction inter = enactedInteractionList2.get(i);
+				if(inter.equals(enactedInteraction1)) {
+					indexList.add(i);
+				}
+			}
+			
+			List<List<Interaction>> multiInteractionList = new ArrayList<List<Interaction>>();
+			int indexListSize = indexList.size();
+			int index_pre;
+			int index_pos;
+			if(indexListSize>0) {
+				for(int j=0;j<indexListSize;j++) {
+					List<Interaction> interactionSmallList = new ArrayList<Interaction>();
+					index_pre = indexList.get(j);
+					if(j+1 < indexListSize) {
+						index_pos = indexList.get(j+1);
+					}else {
+						index_pos = size;
+					}
+					for(int k=index_pre;k<index_pos;k++) {
+						interactionSmallList.add(enactedInteractionList2.get(k));
+					}
+					
+					if(!isContainsList(multiInteractionList,interactionSmallList)) {
+						CandidateInteraction candidate = new CandidateInteraction();
+						candidate.setCandiInteractionList(interactionSmallList);
+						enactedInteraction1.getCandidateList().add(candidate);
+						multiInteractionList.add(interactionSmallList);
+					}
+				}
+			}
+			//得到了想要的list<list>
+			
+			
+			
+			//估计  下一次的interaction 的action，要检查previous interactions
+			//得到不同序列的interaction之后要选择去执行哪个candidate list,进入exploitation，如果没有则进入exploration过程。
+			String multiInteractionListString = "";
+			if(multiInteractionList.size()>0) {
+				int shortDistance=100;
+				double meanValence = -20;
+				for(int h=0;h<multiInteractionList.size();h++) {
+					int tempTotalValence = 0;//用于计算平均value
+					List<Interaction> tempInteractionList = multiInteractionList.get(h);
+					multiInteractionListString = multiInteractionListString+tempInteractionList+"\r\n";
+					int tempSize = tempInteractionList.size();
+					if(tempSize>0) {
+						boolean isHaveMaxValence = false;
+						for(int l=0;l<tempSize;l++) {
+							Interaction inte = tempInteractionList.get(l);
+							tempTotalValence+=inte.getValence();
+							if(inte.getValence() >=  maxValence) {
+								isHaveMaxValence = true;//只有达到maxValua的tempInteractionList才会在之后的interaction当中考虑
+							}
+						}
+						System.out.println("tempInteractionList is:"+tempInteractionList);
+						System.out.println("maxValence is:"+maxValence+" isHaveMaxValence is:"+isHaveMaxValence);
+						
+						if(isHaveMaxValence) {
+							double tempMeanValence = (double)tempTotalValence/(double)tempSize;
+							BigDecimal bMeanValence = new BigDecimal(Double.toString(meanValence)); 
+					        BigDecimal bTempMeanValence = new BigDecimal(Double.toString(tempMeanValence)); 
+					        System.out.println("tempTotalValence is:"+tempTotalValence+" tempSize is:"+tempSize+" tempMeanValence is:"+tempMeanValence);
+							if(bMeanValence.compareTo(bTempMeanValence)<0) {
+								if(tempSize<shortDistance) {
+									shortDistance = tempSize;
+									meanValence = tempMeanValence;
+									bestSelection = tempInteractionList;
+								}
+							}
+						}else{//if isHaveMaxValence = false, just print the result.
+							double tempMeanValence = (double)tempTotalValence/(double)tempSize;
+							System.out.println("The tempMeanValence is:"+tempMeanValence);
+						}
+					}
+				}// end for 备选列表
+				System.out.println("shortDistance is:"+shortDistance+" meanValence is:"+meanValence);
+				System.out.println();
+			}// end if multiInteractionList.size() > 0 
+			System.out.println("multiInteractionList is:");
+			System.out.println(multiInteractionListString);
+			System.out.println();
+			System.out.println("the selected intendedInteractionList is:"+bestSelection);
+			
+			
+			//如果没有获得bestSelection，那么之前的交互经验也可以为后面的交互提供教训，从而避免一些“之前不好”的交互经验。
+			//但是这里存在一个问题，如果agent的处境已经发生了变化，那么这个动作还有什么用处呢？
+			//如何能够明白处境的变化呢？这个处境的变化能够为更好的prediction提供准确的结果。
+			//处境的变化可以通过enacted interaction获得，因为结果不同，那么环境不同，但是这是一种在发生了这个动作之后
+			//来判断结果的方式，需要具备预测的性质，能够在发生之前选择其他动作来避免预测的结果。
+			
+			//avoidance action selection 避免“坏动作”的问题
+			if(bestSelection == null) {//在这种情况下需要排除之前没有达到valence的actions，在下一次的interaction当中避免这种action
+				avoidActoinList.clear();
+				/*
+				if(enactedInteraction1.getValence() <= minValence) {
+					System.out.println("The current enacted interaction has the smallest valence");
+				}
+				*/
+				avoidActoinList.add(enactedInteraction1.getExperience().getAction());
+				if(multiInteractionList.size()>0) {
+					for(int g=0;g<multiInteractionList.size();g++) {
+						List<Interaction> tempInteractionListForAvoiding = multiInteractionList.get(g);
+						if(tempInteractionListForAvoiding.size()>1) {
+							if(!avoidActoinList.contains(tempInteractionListForAvoiding.get(1).getExperience().getAction())) {
+								avoidActoinList.add(tempInteractionListForAvoiding.get(1).getExperience().getAction());
+							}
+						}
+					}//end for
+				}
+			}
+			System.out.println("avoidActoinList is:"+avoidActoinList);
+		}else {
+			if(bestSelection == null) {
+				avoidActoinList.clear();
+				avoidActoinList.add(enactedInteraction1.getExperience().getAction());
+			}
+		}
+		
+		return bestSelection;
+	}
+	
+	
+	public void reasoningProcess() {
+		System.out.println("the reasoning process");
+	}
+	
+	
+	
+	public boolean isContainsList(List<List<Interaction>> multiInteractionList,List<Interaction> interactionSmallList) {
+		boolean isContains = false;
+		for(int k=0;k<multiInteractionList.size();k++) {
+			if(isEqualList(multiInteractionList.get(k),interactionSmallList)) {
+				isContains = true;
+			}
+		}
+		return isContains;
+	}
+
+	public void learnCompositeInteraction(Interaction enactedInteraction2) {
+		// TODO Auto-generated method stub
+		System.out.println("learnCompositeInteraction()");
+		Interaction previousInteraction = this.getEnactedInteraction(); 
+		Interaction lastInteraction = enactedInteraction2;
+		Interaction previousSuperInteraction = this.getSuperInteraction();
+		Interaction lastSuperInteraction = null;
+		
+		if (previousInteraction != null) {
+			lastSuperInteraction = addOrGetAndReinforceCompositeInteraction(previousInteraction, lastInteraction);
+		}
+		if (previousSuperInteraction != null){
+            this.addOrGetAndReinforceCompositeInteraction(previousSuperInteraction.getPreInteraction(), lastSuperInteraction);
+            this.addOrGetAndReinforceCompositeInteraction(previousSuperInteraction, lastInteraction);
+        }
+        this.setSuperInteraction(lastSuperInteraction);
+	}
+
+	public Interaction addOrGetAndReinforceCompositeInteraction(Interaction previousInteraction,Interaction lastInteraction) {
+		// TODO Auto-generated method stub
+		String label = "<" + previousInteraction.getLabel() + lastInteraction.getLabel() + ">";
+		Interaction interaction = INTERACTIONS.get(label);
+		if (interaction == null){
+			interaction = addOrGetInteraction(label); 
+			interaction.setPreInteraction(previousInteraction);
+			interaction.setPostInteraction(lastInteraction);
+			interaction.setValence(previousInteraction.getValence() + lastInteraction.getValence());
+			//addOrGetAbstractExperiment(interaction);
+			interaction.incrementWeight();
+			System.out.println("LEARN: " + interaction.toString());
+        }else {
+        	interaction.incrementWeight();
+			System.out.println("REINFORCE: " + interaction.toString());
+		}
+		return interaction;
+	}
+
+	public Experience addOrGetAbstractExperiment(Interaction interaction) {
+		// TODO Auto-generated method stub
+		String label = interaction.getLabel().replace('e', 'E').replace('>', '|');
+        if (!EXPERIENCES.containsKey(label)){
+        	Experience abstractExperience =  new Experience(label,6);
+        	//abstractExperience.setIntendedInteraction(interaction);
+			interaction.setExperience(abstractExperience);
+            EXPERIENCES.put(label, abstractExperience);
+        }
+        return EXPERIENCES.get(label);
+	}
+
+	public Interaction addOrGetInteraction(String label) {
+		// TODO Auto-generated method stub
+		if (!INTERACTIONS.containsKey(label))
+			INTERACTIONS.put(label, createInteraction(label));			
+		return INTERACTIONS.get(label);
+	}
+
+	public Interaction selectInteraction(List<Anticipation> anticipations) {
+		Collections.sort(anticipations);
+
+		/*String antiString = " ";
+		for(Anticipation anti : anticipations) {
+			antiString+=anti.getInteraction()+" "+anti.getProclivity()+"\r\n";
+		}
+		System.out.println("the sorted anticipations are:");
+		System.out.println(antiString);*/
+		
+		Anticipation selectedAnticipation = (Anticipation)anticipations.get(0);
+		return getIntendedInteraction(selectedAnticipation.getInteraction());
+	}
+	
+	public Interaction getIntendedInteraction(Interaction interaction) {
+		if(!interaction.isPrimitive()) {
+			return getIntendedInteraction(interaction.getPreInteraction());
+		}else {
+			return interaction;
+		}
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+	public Position getInitialPosition(){
+		List<Position> availablePositionList = new ArrayList<Position>();
+		int width = env.length;
+		int length = env[0].length;
+		for(int i=0;i<width;i++){
+			for(int j=0;j<length;j++) {
+				if(env[i][j] == 0) {
+					Position temp = new Position();
+					temp.setPointX(i);
+					temp.setPointY(j);
+					availablePositionList.add(temp);
+				}
+			}
+		}
+		//int randomIndex = random.nextInt(availablePositionList.size());
+		Position initialPosition = (Position)availablePositionList.get(0);
+		//String tempDirection = directions[random.nextInt(4)];//有四个不同的方向，随机选择一个方向
+		initialPosition.setDirection("left");
+		return initialPosition;
+	}
+	
+	public Experience addOrGetExperience(String label,int actionType) {
+		if (!EXPERIENCES.containsKey(label))
+			EXPERIENCES.put(label, createExperience(label,actionType));
+		return EXPERIENCES.get(label);
+	}
+	
+	public Experience createExperience(String label,int actionType){
+		return new Experience(label,actionType);
+	}
+	
+	public Interaction addOrGetPrimitiveInteraction(Experience experience, int result, int valence) {
+		String label = experience.getLabel()+result;
+		if (!INTERACTIONS.containsKey(label)){
+			Interaction interaction = createInteraction(label);
+			interaction.setExperience(experience);
+			interaction.setResult(result);
+			interaction.setValence(valence);
+			INTERACTIONS.put(label, interaction);			
+		}
+		Interaction interaction = INTERACTIONS.get(label);
+		return interaction;
+	}
+	
+	public Interaction createInteraction(String label) {
+		return new Interaction(label);
+	}
+	
+	public List<Anticipation> anticipate(){
+		System.out.println("anticipate()");
+		List<Anticipation> anticipations = getDefaultAnticipations();
+		List<Interaction> activatedInteractions =  getActivatedInteractions();// the activated composite interaction
+		if (this.getEnactedInteraction() != null){
+			for (Interaction activatedInteraction : activatedInteractions){
+				int proclivitytem = activatedInteraction.getWeight() * activatedInteraction.getPostInteraction().getValence();
+				Anticipation anticipation = new Anticipation(activatedInteraction.getPostInteraction(),proclivitytem);
+				int index = anticipations.indexOf(anticipation);
+				if (index < 0) {
+					//System.out.println("Add new propostion");
+					anticipations.add(anticipation);
+				}else {
+					//System.out.println("Update the proposition");
+					anticipations.get(index).addProclivity(proclivitytem);
+				}
+			}
+		}
+		
+		return anticipations;
+	}
+	
+	public List<Anticipation> getDefaultAnticipations(){
+		System.out.println("getDefaultAnticipations()");
+		List<Anticipation> anticipations = new ArrayList<Anticipation>();
+		for (Interaction interaction : this.INTERACTIONS.values()){
+			if (interaction.isPrimitive()){
+				Anticipation anticipation = new Anticipation(interaction, 0);
+				anticipations.add(anticipation);
+			}
+		}
+		return anticipations;
+	}
+	
+	public List<Interaction> getActivatedInteractions() {
+		System.out.println("getActivatedInteractions()");
+		List<Interaction> activatedInteractions = new ArrayList<Interaction>();
+		if (this.getEnactedInteraction()!=null) {
+			for (Interaction activatedInteraction : this.INTERACTIONS.values()){
+				if (!activatedInteraction.isPrimitive()) {
+					if (this.getEnactedInteraction().equals(activatedInteraction.getPreInteraction())){
+						activatedInteractions.add(activatedInteraction);
+					}
+				}
+			}
+		}
+		return activatedInteractions;
+	}
+	
+	
+	
+}

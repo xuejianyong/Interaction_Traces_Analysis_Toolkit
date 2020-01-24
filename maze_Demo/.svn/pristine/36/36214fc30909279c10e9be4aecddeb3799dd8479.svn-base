@@ -1,0 +1,58 @@
+package dl;
+
+import java.util.List;
+
+public class Anticipation  implements AnticipationInterface{
+
+	public Experience experience;
+	public Interaction interaction;
+	public int proclivity;
+	public int visiteTimes;
+	public List<Interaction> anticipations;
+	
+	public Anticipation(Interaction interaction, int i) {
+		// TODO Auto-generated constructor stub
+		this.interaction = interaction;
+		this.proclivity = i;
+	}
+	public Experience getExperience() {
+		return experience;
+	}
+	public void setExperience(Experience experience) {
+		this.experience = experience;
+	}
+	public Interaction getInteraction() {
+		return interaction;
+	}
+	public void setInteraction(Interaction interaction) {
+		this.interaction = interaction;
+	}
+	public int getProclivity() {
+		return proclivity;
+	}
+	public void setProclivity(int proclivity) {
+		this.proclivity = proclivity;
+	}
+	public int getVisiteTimes() {
+		return visiteTimes;
+	}
+	public void setVisiteTimes(int visiteTimes) {
+		this.visiteTimes = visiteTimes;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		// TODO Auto-generated method stub
+		return ((Anticipation)obj).getInteraction() == this.interaction;
+	} 
+	
+	public int compareTo(Anticipation anticipation1){
+		return new Integer((anticipation1).getProclivity()).compareTo(this.proclivity);
+	}
+	public void addProclivity(int i) {
+		// TODO Auto-generated method stub
+		this.setProclivity(this.getProclivity()+i);
+	}
+	
+	
+}

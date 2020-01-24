@@ -1,0 +1,100 @@
+	
+				//the reasoning process,可以作为一个参照内容，来表达这个算法比原来算法在某些方面的改进
+				/*
+				if(!isCheckList) {
+					intendedInteractionList = searchProcess(enactedInteractionList,enactedInteraction1);
+					if(intendedInteractionList == null) {
+						System.out.println("The intendedInteractionList is null");
+						intendedInteraction = selectOtherInteraction(enactedInteraction1,1);
+						isCheckList = false;
+					}else {
+						int intendedListSize = intendedInteractionList.size();
+						if(intendedListSize>0) {
+							if(intendedListSize ==1) {
+								intendedInteraction = intendedInteractionList.get(0);//enactedInteraction1
+							}else {
+								sequenceIndex = 1;
+								intendedInteraction = intendedInteractionList.get(sequenceIndex);
+								intendedInteractionActionList.clear();
+								intendedInteractionActionList.add(intendedInteraction.getExperience().getAction());
+								//sequenceIndex++;
+							}
+							isCheckList = true;//找到了一个完整的list，然后开始进入检验的过程。
+						}
+					}
+					System.out.println("isCheckList is:"+isCheckList);
+				}else {// 进入intendedInteractionList当中逐一验证执行
+					int intendedListSize1 = intendedInteractionList.size();
+					int tempSequenceIndex = sequenceIndex+1;
+					
+					
+					if(intendedListSize1 == 1) {
+						if(enactedInteraction1.equals(intendedInteraction)) {
+							intendedInteraction = enactedInteraction1;
+							isCheckList = true;
+						}else { //size ==1 enactedInteraction != enactedInteraction
+							intendedInteractionList = searchProcess(enactedInteractionList,enactedInteraction1);
+							if(intendedInteractionList == null) {
+								intendedInteraction = selectOtherInteraction(enactedInteraction1,2);
+								isCheckList = false;
+							}else {
+								int intendedListSize = intendedInteractionList.size();
+								if(intendedListSize>0) {
+									if(intendedListSize ==1) {
+										intendedInteraction = intendedInteractionList.get(0);//enactedInteraction1
+									}else {
+										sequenceIndex = 1;
+										intendedInteraction = intendedInteractionList.get(sequenceIndex);
+										intendedInteractionActionList.clear();
+										intendedInteractionActionList.add(intendedInteraction.getExperience().getAction());
+									}
+									isCheckList = true;
+								}
+							}
+						}
+					}else {//获得的intendedInteractionList>1
+						if(enactedInteraction1.equals(intendedInteraction)) {
+							if(tempSequenceIndex < intendedListSize1) {
+								sequenceIndex++;
+								intendedInteraction = intendedInteractionList.get(sequenceIndex);
+								if(!intendedInteractionActionList.contains(intendedInteraction.getExperience().getAction()))
+									intendedInteractionActionList.add(intendedInteraction.getExperience().getAction());
+								isCheckList = true;
+							}else{
+								System.out.println("finish the full sequence of the intended interaction list");
+								intendedInteractionActionList.clear();
+								intendedInteractionList = searchProcess(enactedInteractionList,enactedInteraction1);
+								if(intendedInteractionList == null) {
+									intendedInteraction = selectOtherInteraction(enactedInteraction1,4);
+									isCheckList = false;
+								}else {
+									int intendedListSize = intendedInteractionList.size();
+									if(intendedListSize>0) {
+										if(intendedListSize ==1) {
+											intendedInteraction = intendedInteractionList.get(0);//enactedInteraction1
+										}else {
+											if(!intendedInteractionActionList.contains(enactedInteraction1.getExperience().getAction())) {
+												intendedInteractionActionList.add(enactedInteraction1.getExperience().getAction());
+											}
+											sequenceIndex = 1;
+											intendedInteraction = intendedInteractionList.get(sequenceIndex);
+											intendedInteractionActionList.add(intendedInteraction.getExperience().getAction());
+										}
+										isCheckList = true;
+									}
+								}
+							}
+						}else {//intendedItneractionList 当中 interaction不相等，即为验证过程当中有问题
+							System.out.println("Following the intended interaction list, but there is something not right");
+							System.out.println("intendedInteractionActionList is:"+intendedInteractionActionList);
+							intendedInteraction = selectOtherIntendedInteraction(intendedInteractionActionList);
+							intendedInteractionActionList.clear();
+							isCheckList = false;
+						}
+					}//size > 1 的情况
+				}//执行intendedInteractionList逐一验证interaction
+				
+				//from here
+				List<Anticipation> anticipations = anticipate();
+				intendedInteraction = selectInteraction(anticipations);
+				*/

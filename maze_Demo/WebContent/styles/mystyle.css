@@ -1,0 +1,146 @@
+div.outdivclass{
+    background-color: #fff;
+    width: 1300px;
+    height: 1030px;
+    border: 0px solid rgb(241, 22, 230);
+    overflow: auto;
+}
+
+div.leftdiv{
+    background-color: #fff;
+    width: 160px;
+    height: 1020px;
+    float: left;
+    border: 0px solid blue;
+    padding: 0px;
+
+    font-size: 10px;
+    font-weight: bold;
+    padding-left: 25px;
+    line-height: 12px;
+    position: relative;
+}
+
+div.textComposite{
+    border: 0px solid black;
+    height: 30px;
+    width: 150px;
+    position: absolute;
+    top: 770px;
+}
+
+div.intendedEnacted{
+    border: 0px solid black;
+    height: 50px;
+    width: 150px;
+    position: absolute;
+    top: 850px;
+}
+
+div.stepValence{
+    border: 0px solid black;
+    height: 50px;
+    width: 160px;
+    position: absolute;
+    top: 930px;
+}
+
+
+div.scrolldivclass{
+    background-color: #fff;
+    padding: 0px;
+    width: 1100px;
+    height: 1020px;
+    float: left;
+    border: 0px solid rgb(22, 241, 106);
+    overflow: auto;
+    position: relative;
+}
+
+div.anticipationDivclass{
+    position: absolute;
+    display: none;
+    left: 0px;
+    top: 0px;
+}
+
+
+div.intendedEnactedCompositeInteraction{
+    position: absolute;
+    display: none;
+    left: 0px;
+    top: 0px;
+}
+
+div.compositeInteractionSvgDivClass{
+    position: absolute;
+    display: none;
+    left: 0px;
+    top: 0px;
+    border: 0px solid rgb(12, 12, 12);
+}
+
+div.temporaryDivClass{
+    position: absolute;
+    display: none;
+    left: 0px;
+    top: 0px;
+}
+
+div.first{
+    margin-top: 790px;
+    height: 65px;
+    text-align:left;
+    vertical-align: middle;
+}
+
+div.second{
+}
+
+div.exportResult{
+    background-color: bisque;
+    width: 1000px;
+    height: 500px;
+    overflow: auto;
+    border: 1px solid rgb(22, 241, 106);
+}
+
+.buttonClassStart{
+    background-color: rgb(179, 243, 142);
+    width: 120px;
+    height: 30px;
+    margin: 10px;
+    font-size: 16px;
+    border: 1px solid black;
+}
+
+.buttonClassStop{
+    background-color: rgb(236, 60, 60);
+    border: 1px solid black;
+    width: 120px;
+    height: 30px;
+    margin: 10px;
+    font-size: 16px;
+}
+
+.buttonClassReset{
+    background-color: rgb(203, 206, 201);
+    width: 120px;
+    height: 30px;
+    margin: 10px;
+    font-size: 16px;
+    border: 1px solid black;
+}
+
+.textclasscomposite{
+	vertical-align: middle;
+}
+.textclassintended{
+	
+}
+.textclassenacted{
+}
+.textclassstep{
+}
+.textclassvalence{
+}

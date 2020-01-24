@@ -1,0 +1,174 @@
+<!doctype html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" media="all" href="css/reset.css" /> <!-- reset css -->
+<script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
+
+<style>
+    body{ background-color: ivory; }
+    canvas{border:1px solid red;}
+</style>
+
+<script>
+var innerDist = 0;
+var xcenter = 0;
+var ycenter = 0;
+var interval = 0;
+var rate = 10;
+
+
+$(function(){
+
+	var c=document.getElementById("myCanvas");
+	var width = parseInt(c.getAttribute("width"));
+	var height = parseInt(c.getAttribute("height"));
+	interval = width/rate;
+	var ctx=c.getContext("2d");
+	ctx.fillStyle = "#0F9";
+	ctx.fillRect(0,0,interval,height);//left |
+	ctx.fillRect(0,0,width,interval);// up -
+	ctx.fillRect(width-interval,0,width,height);//right |
+	ctx.fillRect(0,height-interval,width,height);//down -
+	ctx.fillRect(interval*3,interval*3,width-interval*6,height-interval*6);//center map
+	
+	innerDist = interval/2;
+	arrowDraw(75,75,innerDist,"up")
+    
+    // draw an unrotated reference rect
+    
+
+    // draw a rotated rect
+    
+
+    
+
+}); // end $(function(){});
+
+function drawRotatedRect(){
+
+	var startX=75;
+    var startY=75;
+    drawRotatedRect(startX,startY,100,20,90);
+    
+	var canvas=document.getElementById("canvas");
+    var ctx=canvas.getContext("2d");
+    // first save the untranslated/unrotated context
+
+    ctx.beginPath();
+    // move the rotation point to the center of the rect
+    ctx.translate( x+width/2, y+height/2 );
+    // rotate the rect
+    ctx.rotate(degrees*Math.PI/180);
+
+    // draw the rect on the transformed context
+    // Note: after transforming [0,0] is visually [x,y]
+    //       so the rect needs to be offset accordingly when drawn
+    alert(-width/2)
+    alert(-height/2)
+    ctx.rect( -width/2, -height/2, width,height);
+    ctx.fillStyle="gold";
+    ctx.fill();
+
+    // restore the context to its untranslated/unrotated state
+
+}
+
+function arrowDraw(xcenter,ycenter,innerDist,direction){
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	ctx.fillStyle = "#30F";
+	ctx.beginPath();
+	switch(direction){
+	case "up":
+		ctx.moveTo(xcenter,ycenter-innerDist);
+		ctx.lineTo(xcenter-innerDist,ycenter+innerDist);
+		ctx.lineTo(xcenter, ycenter+innerDist/2);
+		ctx.lineTo(xcenter+innerDist, ycenter+innerDist);
+		break;
+	case "down":
+		ctx.moveTo(xcenter,ycenter+innerDist);
+		ctx.lineTo(xcenter-innerDist,ycenter-innerDist);
+		ctx.lineTo(xcenter,ycenter-innerDist/2);
+		ctx.lineTo(xcenter+innerDist,ycenter-innerDist);
+		break;
+	case "left":
+		ctx.moveTo(xcenter-innerDist,ycenter);
+		ctx.lineTo(xcenter+innerDist,ycenter-innerDist);
+		ctx.lineTo(xcenter+innerDist/2,ycenter);
+		ctx.lineTo(xcenter+innerDist,ycenter+innerDist);
+		break;
+	case "right":
+		ctx.moveTo(xcenter+innerDist,ycenter);
+		ctx.lineTo(xcenter-innerDist,ycenter-innerDist);
+		ctx.lineTo(xcenter-innerDist/2,ycenter);
+		ctx.lineTo(xcenter-innerDist,ycenter+innerDist);
+		break;
+	}
+	ctx.closePath();
+	ctx.fill();
+}
+
+function start(){
+	var datas ={
+		"isInitialState":isInitialState,
+		"direction":direction,
+		"isFirstInteraction":isFirstInteraction,
+		"valenceBump":$("#valenceBump").val(),
+		"valenceMoveForward":$("#valenceMoveForward").val(),
+		"valenceTurn":$("#valenceTurn").val()
+		
+	};
+	$.ajax({
+		url:'/maze/dl/AjaxServlet',
+	    type:'GET',
+	    async : true,
+	    data:datas,
+	    dataType:'json',
+	    success:function(data,status){
+	    	xcenter = innerDist + data.coordiY*interval;
+	    	ycenter = innerDist + data.coordiX*interval;
+	    	direction = data.direction;
+	    	isFirstInteraction = data.isFirstInteraction;
+	    	isBoundary = data.isBoundary;
+	    	valence = data.valence;
+	    	actionIndex = data.actionIndex;
+	    	
+	    	var preXcenter = innerDist + data.preCoordiY*interval;
+	    	var preYcenter = innerDist + data.preCoordiX*interval;
+	    	
+	    	$("#xcenter").val(xcenter);
+			$("#ycenter").val(ycenter);
+			$("#direction").val(direction);
+			$("#valence").val(valence);
+			$("#isBump").val(isBoundary);
+			$("#actionIndex").val(actionToString(actionIndex));
+			
+	    	
+	    	if(isBoundary == "yes"){
+	    		goFoward = false;
+	    	}else{
+	    		goFoward = true;
+	    	}
+	    	
+	    	clearCurrent(preXcenter,preYcenter,innerDist);
+	    	arrowDraw(xcenter,ycenter,innerDist,direction);
+			drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			
+			setTimeout('start()',1000);
+			
+	        },
+	    error:function(){
+	    	alert('start error');
+	    	}
+	});
+}
+
+</script>
+
+</head>
+
+<body >
+    <canvas id="canvas" width="500" height="500"></canvas>
+    <input type="button" onClick="drawRotatedRect()" value="click" />
+</body>
+</html>

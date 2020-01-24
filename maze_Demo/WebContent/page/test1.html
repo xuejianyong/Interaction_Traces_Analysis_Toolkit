@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MyGame</title>
+    <style>
+        body{
+            padding: 10px;
+        }
+        #myCanvas {
+            margin: 0 auto;
+            border: black 1px solid;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <div>
+        <!--<h3>Game游戏</h3>-->
+        <div>
+            <canvas id="myCanvas" width="600px" height="600px"></canvas>
+        </div>
+        <div>
+            <div class="btn-group" role="group" aria-label="...">
+                <button type="button" class="btn btn-default" onclick="doMove.left()">←</button>
+                <button type="button" class="btn btn-default" onclick="doMove.right()">→</button>
+                <button type="button" class="btn btn-default" onclick="doMove.up()">↑</button>
+                <button type="button" class="btn btn-default" onclick="doMove.down()">↓</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var width = 600;
+    var height = 600;
+    var speed = 10;
+    var x = 0, y = 0;
+    var ctx = document.getElementById("myCanvas").getContext("2d");
+    document.body.onkeydown = function (evt) {
+        var e = evt || event;
+        switch (e.keyCode) {
+            case 37:
+                doMove.left();
+                break;
+            case 39:
+                doMove.right();
+                break;
+            case 38:
+                doMove.up();
+                break;
+            case 40:
+                doMove.down();
+                break;
+        }
+
+    }
+
+
+    var doMove = {
+        up: function () {
+            y -= speed
+            y < 0 ? y = 0 : y;
+            drawRect(x, y)
+        },
+        down: function () {
+            y += speed
+            y > height - 50 ? y = height - 50 : y;
+            drawRect(x, y)
+        }, left: function () {
+            x -= speed;
+            x < 0 ? x = 0 : x;
+            drawRect(x, y)
+        }, right: function () {
+            x += speed
+            x > width - 50 ? x = width - 50 : x;
+            drawRect(x, y)
+        }
+    }
+
+
+    function drawRect(x, y) {
+        ctx.clearRect(0, 0, width, height);
+        ctx.beginPath();
+        ctx.fillStyle = "red";
+        ctx.strokeStyle = "green";
+        ctx.rect(x, y, 50, 50);
+        ctx.stroke();
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    drawRect(x, y)
+</script>
+</body>

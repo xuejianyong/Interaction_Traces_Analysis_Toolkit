@@ -1,0 +1,37 @@
+package dl;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
+public class Test1 {
+	
+	public Test1() {
+		List<Integer> intlist = new ArrayList<Integer>();
+		intlist.add(1);
+		intlist.add(2);
+		intlist.add(3);
+		intlist.add(4);
+		intlist.add(5);
+		intlist.add(6);
+		int size = intlist.size();
+		
+		
+		
+		List<Integer> intlist2 = new ArrayList<Integer>();
+		
+		for(int k: intlist)System.out.println(k);
+		
+		
+		
+	}
+	
+	
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Test1 tes1 = new Test1();
+	}
+}

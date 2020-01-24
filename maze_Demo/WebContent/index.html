@@ -1,0 +1,2323 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" type="image/x-icon" href="./images/logo.png" />
+<link rel="stylesheet" type="text/css" href="./styles/mystyle.css"/>
+
+<script src="./js/jquery-3.3.1.js"></script>
+<script src="./js/highcharts.js"></script>
+
+<script>
+var width = 500;
+var height = 500;
+var interval = width/10;
+var innerDist = interval/2;
+
+var xcenter = 0;
+var ycenter = 0;
+var direction = "";
+var isInitialState = "";
+var resultString = "";
+var startState = false;//用来控制interactin的启停
+
+var isFinishDrawing = false;
+
+function drawEnvironment(){
+	//画主要的交互环境
+	var canvas = document.getElementById("myCanvas");
+	var ctx = canvas.getContext("2d");
+	ctx.fillStyle = "#0F9";
+	
+	//画环境周围边框
+	ctx.fillRect(0,0,interval,height);//left |
+	ctx.fillRect(0,0,width,interval);// up -
+	ctx.fillRect(width-interval,0,width,height);//right |
+	ctx.fillRect(0,height-interval,width,height);//down -
+	/*ctx.fillRect(interval*2,interval*2,interval*5,interval*1);
+	ctx.fillRect(interval*2,interval*3,interval*6,interval*4);
+	ctx.fillRect(interval*3,interval*7,interval*5,interval*1);
+	ctx.fillRect(interval*8,interval*1,interval*1,interval*1);
+	ctx.fillRect(interval*1,interval*8,interval*1,interval*1);*/
+
+	//画主要的交互环境
+	ctx.fillRect(interval*4,interval*1,interval*2,interval*1);
+	ctx.fillRect(interval*5,interval*2,interval*1,interval*3);
+	ctx.fillRect(interval*1,interval*5,interval*5,interval*1);
+	ctx.fillRect(interval*2,interval*2,interval*1,interval*2);
+	ctx.fillRect(interval*3,interval*3,interval*1,interval*1);
+	ctx.fillRect(interval*8,interval*1,interval*1,interval*1);
+	ctx.fillRect(interval*1,interval*8,interval*1,interval*1);
+	ctx.fillRect(interval*7,interval*3,interval*1,interval*4);
+	ctx.fillRect(interval*3,interval*7,interval*5,interval*1);
+
+	isFinishDrawing = true;
+}
+
+function arrowDraw(xcenter,ycenter,innerDist,direction){
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	ctx.fillStyle = "#30F";
+	ctx.beginPath();
+	switch(direction){
+	case "up":
+		ctx.moveTo(xcenter,ycenter-innerDist);
+		ctx.lineTo(xcenter-innerDist,ycenter+innerDist);
+		ctx.lineTo(xcenter, ycenter+innerDist/2);
+		ctx.lineTo(xcenter+innerDist, ycenter+innerDist);
+		break;
+	case "down":
+		ctx.moveTo(xcenter,ycenter+innerDist);
+		ctx.lineTo(xcenter-innerDist,ycenter-innerDist);
+		ctx.lineTo(xcenter,ycenter-innerDist/2);
+		ctx.lineTo(xcenter+innerDist,ycenter-innerDist);
+		break;
+	case "left":
+		ctx.moveTo(xcenter-innerDist,ycenter);
+		ctx.lineTo(xcenter+innerDist,ycenter-innerDist);
+		ctx.lineTo(xcenter+innerDist/2,ycenter);
+		ctx.lineTo(xcenter+innerDist,ycenter+innerDist);
+		break;
+	case "right":
+		ctx.moveTo(xcenter+innerDist,ycenter);
+		ctx.lineTo(xcenter-innerDist,ycenter-innerDist);
+		ctx.lineTo(xcenter-innerDist/2,ycenter);
+		ctx.lineTo(xcenter-innerDist,ycenter+innerDist);
+		break;
+	}
+	ctx.closePath();
+	ctx.fill();
+}
+
+function enactAction(actionType){
+	var isBump = false;
+	var nextPosX = 0;
+	var nextPosY = 0;
+
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	
+	clearCurrent(ctx,xcenter,ycenter);
+	var interactionString = "";
+	
+	switch(actionType){
+	case 0://move forward
+		switch(direction){
+		case "up":
+			nextPosX = xcenter;
+			nextPosY = ycenter - interval;break;
+		case "right":
+			nextPosX = xcenter + interval;
+			nextPosY = ycenter;break;
+		case "down":
+			nextPosX = xcenter;
+			nextPosY = ycenter + interval;break;
+		case "left":
+			nextPosX = xcenter - interval;
+			nextPosY = ycenter;break;
+		}
+		isBump = isBoundary(nextPosX,nextPosY);//false：表示没有撞墙  true：表示撞墙了
+		if(!isBump){//no bump with the wall 没有撞墙
+			xcenter = nextPosX;
+			ycenter = nextPosY;
+			arrowDraw(xcenter,ycenter,innerDist,direction);
+			//drawForward(xcenter,ycenter,isBump,actionType);
+		}else{//撞墙了，原地不变
+			arrowDraw(xcenter,ycenter,innerDist,direction);
+			//drawForward(xcenter,ycenter,isBump,actionType);
+		}
+		interactionString = "ee"+actionType;
+		break;
+	case 1://turn left
+		switch(direction){
+		case "up":
+			direction = "left";
+			break;
+		case "right":
+			direction = "up";
+			break;
+		case "down":
+			direction = "right";
+			break;
+		case "left":
+			direction = "down";
+			break;
+		}
+		arrowDraw(xcenter,ycenter,innerDist,direction);
+		interactionString = "e"+actionType;
+		break;
+	case 2://turn right
+		switch(direction){
+		case "up":
+			direction = "right";
+			break;
+		case "right":
+			direction = "down";
+			break;
+		case "down":
+			direction = "left";
+			break;
+		case "left":
+			direction = "up";
+			break;
+		}
+		arrowDraw(xcenter,ycenter,innerDist,direction);
+		interactionString = "e"+actionType;
+		break;//turn right
+	case 3://feel front
+		switch(direction){
+		case "up":
+			nextPosX = xcenter;
+			nextPosY = ycenter - interval;break;
+		case "right":
+			nextPosX = xcenter + interval;
+			nextPosY = ycenter;break;
+		case "down":
+			nextPosX = xcenter;
+			nextPosY = ycenter + interval;break;
+		case "left":
+			nextPosX = xcenter - interval;
+			nextPosY = ycenter;break;
+		}
+		isBump = isBoundary(nextPosX,nextPosY);
+		arrowDraw(xcenter,ycenter,innerDist,direction);
+		//drawForward(xcenter,ycenter,isBump,actionType);
+		interactionString = "e"+actionType;
+		break;
+	case 4://feel left
+		switch(direction){
+		case "up":
+			nextPosX = xcenter-interval;
+			nextPosY = ycenter;break;
+		case "right":
+			nextPosX = xcenter;
+			nextPosY = ycenter-interval;break;
+		case "down":
+			nextPosX = xcenter+interval;
+			nextPosY = ycenter;break;
+		case "left":
+			nextPosX = xcenter;
+			nextPosY = ycenter+interval;break;
+		}
+		isBump = isBoundary(nextPosX,nextPosY);
+		arrowDraw(xcenter,ycenter,innerDist,direction);
+		interactionString = "e"+actionType;
+		//drawFeelLeft(xcenter,ycenter,isBump);
+		break;
+	case 5://feel right
+		switch(direction){
+		case "up":
+			nextPosX = xcenter+interval;
+			nextPosY = ycenter;break;
+		case "right":
+			nextPosX = xcenter;
+			nextPosY = ycenter+interval;break;
+		case "down":
+			nextPosX = xcenter-interval;
+			nextPosY = ycenter;break;
+		case "left":
+			nextPosX = xcenter;
+			nextPosY = ycenter-interval;break;
+		}
+		isBump = isBoundary(nextPosX,nextPosY);
+		arrowDraw(xcenter,ycenter,innerDist,direction);
+		interactionString = "e"+actionType;
+		//drawFeelRight(xcenter,ycenter,isBump);
+		break;
+	}
+
+	//在交互中的agent中 画出小的enacted interaction
+	var interactionEnactResultString = "";
+	if(isBump)interactionEnactResultString = "0";//表示撞墙了 enacted  interaction result
+	else interactionEnactResultString = "1";//表示没有撞墙     enacted  interaction result
+	interactionString = interactionString + interactionEnactResultString;
+	var imageSmall = document.getElementById(interactionImages[interactionString]);
+	
+	//agent 当中的小图标重新定义绘画原点和相应的旋转角度
+	ctx.save();
+	ctx.translate(xcenter,ycenter);
+	switch(direction){
+		case "up":
+			break;
+		case "right":
+			ctx.rotate(90*Math.PI/180);
+			break;
+		case "down":
+			ctx.rotate(180*Math.PI/180);
+			break;
+		case "left":
+			ctx.rotate(270*Math.PI/180);
+			break;
+		}
+	ctx.drawImage(imageSmall,-10,-10,20,20);
+	ctx.restore();
+	return isBump;//返回这个结果给enactive function
+}
+
+function clearCurrent(ctx,xcenter,ycenter){
+ 	ctx.clearRect(xcenter-innerDist,ycenter-innerDist,interval,interval);
+}
+
+function isBoundary(nextPosX,nextPosY){
+	var isBoundary = false;
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	var colors = ctx.getImageData(nextPosX, nextPosY, 1, 1).data;
+	var red=colors[0];
+	var green=colors[1];
+	var blue=colors[2];
+	if(red==0 && green==255 && blue==153){
+		isBoundary = true;
+	}
+	return isBoundary;
+}
+
+function getActionString(actionType){
+	var actionS = "";
+	switch(actionType){
+	case 0:actionS="move forward";break;
+	case 1:actionS="turn left";break;
+	case 2:actionS="turn right";break;
+	case 3:actionS="feel front";break;
+	case 4:actionS="feel left";break;
+	case 5:actionS="feel right";break;
+	}
+	return actionS;
+}
+
+
+var isclickEnv = 1;//按下的是哪个键
+var xindexEnv = 0;
+var yindexEnv = 0;
+function mouseClick(canvas, event){
+	var context = canvas.getContext("2d");	
+    var rect = canvas.getBoundingClientRect();
+    var x = event.clientX - rect.left * (canvas.width / rect.width);
+    var y = event.clientY - rect.top * (canvas.height / rect.height);
+    var clickNum = event.button;
+    if(x>50 && x<450 && y>50 && y<450 && x%50>0 && y%50>0){//只能在最大外边框的范围内修改环境，
+    	var xnumt = parseInt(x/50);
+    	xindexEnv = xnumt;
+		var xnum = xnumt*50;
+		
+		var ynumt = parseInt(y/50);
+		yindexEnv = ynumt;
+		var ynum = ynumt*50;
+	
+		switch(clickNum){
+		case 0:
+			var colors = context.getImageData(xnum+innerDist, ynum+innerDist, 1, 1).data;
+			var red=colors[0];
+			var green=colors[1];
+			var blue=colors[2];
+			
+			if(red==0 && green==255 && blue==153){
+				context.clearRect(xnum,ynum,50,50);
+			}else{
+				context.fillStyle = "#0F9";
+				context.fillRect(xnum,ynum,50,50);
+			}
+			break;
+		case 2:
+			document.oncontextmenu=new Function("return false");//阻止系统默认右击动作
+			break;
+		}
+		
+    }
+}
+
+function showInteractions(canvas, event){
+	var context = canvas.getContext("2d");	
+    var rect = canvas.getBoundingClientRect();
+    var x = event.clientX - rect.left * (canvas.width / rect.width);
+    var y = event.clientY - rect.top * (canvas.height / rect.height);
+    var clickNum = event.button;
+	alert(x+" "+y);	
+}
+
+function initialMaze(){
+	var canvas = document.getElementById("myCanvas");
+	var ctx = canvas.getContext("2d");
+	canvas.addEventListener("mousedown", function(event) {mouseClick(canvas, event);});//点击改变环境
+
+	var anticipationSvg = document.getElementById("anticipationSvgId");
+	anticipationSvg.setAttribute("height",yPrimitive);
+	
+	var compositeInteractionSvg = document.getElementById("compositeInteractionSvgId");
+	compositeInteractionSvg.setAttribute("height",yPrimitive);
+	
+	var intendedEnactedCompositeInteractionSVG = document.getElementById("intendedEnactedCompositeInteractionSVG");
+	intendedEnactedCompositeInteractionSVG.setAttribute("height",yPrimitive);
+	/*
+	var canvas1 = document.getElementById("canvas1");//用来展示交互过程
+	var ctx1 = canvas1.getContext("2d");
+	canvas1.addEventListener("mousedown", function(event) {showInteractions(canvas1, event);});//这块需要思考一下，
+	*/
+
+	drawEnvironment();
+	isInitialState = "yes";//初始化状态，由于后台的java代码与交互代码公用一个函数，所以需要一个状态来区别一下。
+	var datas ={
+			"isInitialState":isInitialState
+			};
+	$.ajax({
+		url:'/maze/DlServlet',
+	    type:'GET',
+	    async : true,
+	    data:datas,
+	    dataType:'json',
+	    success:function(data,status){
+			//获得初始点的坐标和方向
+	    	xcenter = innerDist + data.coordiY*interval;
+	    	ycenter = innerDist + data.coordiX*interval;
+	    	direction = data.direction;
+	    	isInitialState = data.isInitialState;
+	    	arrowDraw(xcenter,ycenter,innerDist,direction);
+	    	var totalValence = data.totalValence;
+	    	$("#totalValence").val(totalValence);
+	        },
+	    error:function(){
+	    	alert('isInitial error');
+	    	}
+	});
+}
+
+var widthnum = width/50;
+var heightnum = height/50;
+function scanEnv(){
+	var env = "";
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	//xcenter,ycenter;
+	var currenIndexi = parseInt(ycenter/50);
+	var currenIndexj = parseInt(xcenter/50);
+
+    for(var i=0;i<widthnum;i++){
+        var row = [];
+        for(var j=0;j<heightnum;j++){
+			if(i == currenIndexi && j ==currenIndexj){
+				env = env+"0,";
+			}else{
+				var pointX = j*interval+innerDist;
+				var pointY = i*interval+innerDist;
+				var colors = ctx.getImageData(pointX, pointY, 1, 1).data;
+				var red=colors[0];
+				var green=colors[1];
+				var blue=colors[2];
+				if(red==0 && green==255 && blue==153){//绿色区域
+					env = env+"1,";
+				}else{
+					env = env+"0,";
+				}
+			}
+            
+        }
+    }
+    return env;
+}
+
+var b=[];
+function interaction(){
+	if(startState){
+		var datas ={
+			"isInitialState":isInitialState,
+			"env":scanEnv(),//扫描环境，但也不是每次都去扫描环境，只有在触发了环境之后再进行扫描，前台与后台交互的数据量很大的情况下，这样会更加简洁一些。
+			//"isclickEnv":isclickEnv,
+			//"xindexEnv":xindexEnv,
+			//"yindexEnv":yindexEnv,
+			
+			"v_move_forward":$("#v_move_forward").val(),
+			"v_bump":$("#v_bump").val(),
+			"v_turn":$("#v_turn").val(),
+			"v_feel_empty":$("#v_feel_empty").val(),
+			"v_feel_wall":$("#v_feel_wall").val()
+			
+		};
+
+		$.ajax({
+			url:'/maze/DlServlet',
+			type:'GET',
+			async : true,
+			data:datas,
+			dataType:'json',
+			success:function(data,status){
+				var actionType = data.actionType;
+				var drawResult = data.drawResult;//intended  interaction result
+				//isclickEnv = data.isclickEnv;
+				var enactedValence = data.enactedValence;
+				
+				var bumpTimes = data.bumpTimes;
+				
+
+				var drawInteractionString = data.drawInteractionString;//取得composite interaction string from java
+				var drawAnticipationString = data.drawAnticipationString;//取得anticipations string from java
+				
+				var isFinishString = data.isFinishString;
+				var isFirstEnaComInteraction = data.isFirstEnaComInteraction;
+				var isInEnaComInteraction = data.isInEnaComInteraction;
+				var enactComIntString = data.enactComIntString; //intended enacted composite interaction
+				var resultEnactComIntString = data.resultEnactComIntString;//enacted enacted composite interaction
+				
+				//var compositeString = data.compositeString;
+				
+				var totalValence = data.totalValence;
+				var loopNum = data.loopNum;
+				var isReady = data.isReady;
+				var stepNumber = data.stepNumber;
+
+				//testici
+				var exportResult = document.getElementById("export");
+				exportResult.innerHTML = exportResult.innerHTML+"loop_number:"+loopNum+", bump_number:"+bumpTimes+", step_number:"+stepNumber+", totalValence:"+totalValence+"<br>";
+				
+				//highcharts codes
+				var series = chart.series[0],shift = series.data.length > 30; // 当数据点数量超过 20 个，则指定删除第一个点
+				chart.series[0].addPoint([loopNum,totalValence], true, false);
+				var seriesBump = chart.series[0],shift = seriesBump.data.length > 30; // 当数据点数量超过 20 个，则指定删除第一个点
+				chartBump.series[0].addPoint([loopNum,bumpTimes], true, false);
+				
+				//enact process and get the result
+				var isBump = enactAction(actionType);
+				if(isBump)resultString = "0";//表示撞墙了 enacted  interaction result
+				else resultString = "1";//表示没有撞墙     enacted  interaction result
+				
+				
+
+				var actionString = getActionString(actionType)//用来显示action 数字所表示的含义，数字对应不同的文字说明
+				$("#actionType").val(actionString);
+				$("#totalValence").val(totalValence);
+				$("#loopNum").val(loopNum);
+				$("#bumpTimesShowNumber").val(bumpTimes);
+				
+				//组建将要在页面上显示的内容
+				var a = [];
+				a[a.length] = actionType;// 0 动作类型
+				a[a.length] = drawResult;// 1 interaction当中的result intended interaction result
+				a[a.length] = resultString;//2 for enacted interaction result
+				a[a.length] = loopNum;// 3 decision times
+				a[a.length] = drawInteractionString;// 4  composite interaction string
+				a[a.length] = enactedValence;// 5 enacted interaction valence
+				a[a.length] = true;// 6 这个参数现在好像没有用到，现在采用其他方式来实现
+				a[a.length] = drawAnticipationString;// 7 all anticipations string，default anticipation + detail anticipation
+				a[a.length] = isFinishString;// 8 作为 intended interaction (primitive or composite) 执行完成的标志
+				a[a.length] = isFirstEnaComInteraction;// 9 在执行intended composite interaction当中是否是执行第一个
+				a[a.length] = isInEnaComInteraction;// 10 是否在enact composite interaction当中
+				a[a.length] = enactComIntString;// 11 intended composite interaction string
+				a[a.length] = resultEnactComIntString;// 12 enacted  composite interaction
+				
+				
+				
+				
+				/*
+				if(b.length<maxShowNum){
+					b[b.length] = a;
+				}else{
+					b[b.length] = a;
+					for (i = 1; i < b.length; i++) {
+						var te = b[i];
+						b[i-1] = te;
+					}
+					b.pop();
+				}*/
+				
+				//testici
+				drawInteractionsNew(a);
+				//isFinishDrawing = true;
+				
+				//alert(isReady+" "+isFinishDrawing)
+				if(isReady == "ok" && isFinishDrawing){
+					setTimeout('interaction()',$("#time_interval").val());
+					isReady = "";
+					isFinishDrawing = false;
+					
+				}
+
+			},
+			error:function(){
+				alert('start error');
+				}
+		});
+	}
+}
+
+function start(){
+	if(!startState){
+		startState = true;
+		interaction();
+	}
+}
+
+function stop(){
+	startState = false;
+	interaction();
+}
+
+var xdraw = 50;
+var ydraw = 1000;
+var yPrimitive = ydraw-3*interval;//primitive interaction的y轴坐标
+var limitFront = 25;
+var defaultStartPixel = 1215;
+var maxShowNum = 15;
+
+var marginpadding = 4;
+var imageBetweenMargin = 2;//在两个图片之间间距部分
+var defaultmetre = 50; //图片默认的尺寸
+var interactionImages = {
+		"e01":"move_forward",
+		"e00":"bump",
+		"ee01":"move_forward_up",//show move forward up direction
+		"ee00":"bump_up",		 //show move forward up direction
+		"e01a":"move_forward_action",//show action
+		"e11":"turn_left",
+		"e11a":"turn_left_action",//show action
+		"e21":"turn_right",
+		"e21a":"turn_right_action",//show action
+		"e31":"feel_front_empty",
+		"e30":"feel_front_wall",
+		"e30a":"feel_front_action",//show action
+		"e41":"feel_left_empty",
+		"e40":"feel_left_wall",
+		"e40a":"feel_left_action",//show action
+		"e51":"feel_right_empty",
+		"e50":"feel_right_wall",
+		"e50a":"feel_right_action",//show action
+		"close":"close",
+		"describe":"describe",
+		"over":"over",
+		"below":"below"
+
+
+
+}
+
+function drawInteractionsNew(a){
+	drawInteractions(a[0],a[1],a[2],a[3],a[4],a[5],a[6],a[7],a[8],a[9],a[10],a[11],a[12]);
+	isFinishDrawing = true;
+}
+
+var nodes = [];
+function Node(inforstring){
+	this.infoString = inforstring;
+	this.upperNode = null;
+	this.upperNodeDirection = "top";
+	this.leftNode = null;
+	this.rightNode = null;
+	this.level = 0;
+	this.layer = 0;
+	this.nodeId = 0;
+	this.isVisited = false;
+	this.xindex = 0;
+	this.yindex = 0;
+	this.width = 0;
+	this.height = 0;
+	this.isLast = false;
+	this.xindexOriginal = 0;
+	this.yindexOriginal = 0;
+}
+
+//layer的使用，通过计算不同的节点在不同的layer,计算水平之间的间距
+//level用来计算垂直方向的间距
+var compositePadding = 10;
+var compositeInteractionSize = 30;
+var roundRadiusComposite = 20;
+var drawCompositeLevel = 50;//留给level的显示空间值
+var drawEnactedCompositeText = 170;
+var previousInteractionIndex = 0;
+var startEnactedPoint = 0;
+var enactedCompositeInteractionStartPointX = 0;
+var enactedCompositeInteractionStartPointY = 0;
+var compositeInteractionTextLength = 30;
+var primIntEnactRectPadding = 3;
+function drawInteractions(actionType,drawResult,resultString,loopNum,drawInteractionString,enactedValence,visible,drawAnticipationString,isFinishString,isFirstEnaComInteraction,isInEnaComInteraction,enactComIntString,resultEnactComIntString){
+	
+	var svg = document.getElementById("svgid");
+	var anticipationSvgId = document.getElementById("anticipationSvgId");
+	var compositeInteractionSvg = document.getElementById("compositeInteractionSvgId");
+	var temporarySvg = document.getElementById("temporarySvgId");
+	var intendedEnactedCompositeInteractionSVG  = document.getElementById("intendedEnactedCompositeInteractionSVG");
+	
+	
+	//创建一个 composite interaction 的 group，然后在触发intendedInteraction与EnactedInteraction之后的未变形的composite  interaction 放置在这个 group 当中
+	if(isFinishString == "yes"){//其实是从 loopNum =2 开始执行，因为在loopNum=1 当中 isFinishString=no
+		var compositeSvgGroup = document.createElementNS('http://www.w3.org/2000/svg','g'); //创建 svg group
+		compositeSvgGroup.setAttribute("id","compositeGroup"+loopNum);
+		compositeSvgGroup.setAttribute("style","display:none");
+		compositeInteractionSvg.appendChild(compositeSvgGroup);
+
+		//alert(drawInteractionString);
+		//draw the composite interactions
+		if(drawInteractionString != "" && visible){
+			
+			//alert("composite interactions");
+			var correspondX = xdraw;
+			var correspondY = yPrimitive;
+			var interactions = drawInteractionString.split("|");  //LEARN:<e50e00>_-12_1_1 | LEARN:<e50<e50e00>>_-14_1_2 | LEARN:<<e50e50>e00>_-14_1_2|
+			
+			//计算composite Interaction的框的大小
+			var maxCompositeWidth = 0;//找到一个最大宽度的 composite interaction 即可
+			var maxCompositeHeight =0;//计算所有的 composite interaction 的高度
+			var compositeInteractionParameters = [];
+			
+			for(var i=0;i<interactions.length-1;i++){                       //interactionlabel, valence,weight,level        
+				var interaction = interactions[i];
+				var informations = interaction.split(":");
+				var learnState = informations[0];//LEANR 与 ENFORCE 这块内容不太清楚，需要注意
+				var interactionInfos = informations[1].split("_");// <e50e00>_-12_1_1
+
+				defaultmetre = 50;//在画了上一个composite interaction之后，根据level的情况，size会发生变化
+				var interactionLevel = parseInt(interactionInfos[3]);
+				var interactionInfo = interactionInfos[0];//得到了interaction的字符串
+
+				correspondX = xdraw-interval/4;
+				correspondY = correspondY-(interval+innerDist);
+				//开始构建nodes，这个方法在这里需要拆分，注意其中涉及到的几个变量。
+				nodes = drawInteraction(interactionInfo);
+				drawNodes(svg,learnState,nodes,correspondX,correspondY,interactionLevel,1);//interactionLevel 用来计算图案大小与上下间距，最后的参数表示是否画
+				nodes = [];//每画一次之后，每个节点当中存储了大量的信息，为了能够得到有效的数据，这里需要将之前的所有结点清空。
+				//---------------  以上是在原来的svg当中画出 不同的 composite interaction
+				
+
+				//在新的图层当中画没有缩小的 composite interaction
+				//先得到必要的参数之后，再画出图形，所以temporarySvg是为了计算尺度的，没有必要画出这些内容。
+				defaultmetre = compositeInteractionSize;//30
+				nodes = drawInteraction(interactionInfo);
+				drawNodes(temporarySvg,learnState,nodes,correspondX,correspondY,0,2);//0参数表示图形没有缩小，2表示不用画出来。
+				var rootNode = nodes[0];
+				rootNode.xindexOriginal = correspondX;
+				rootNode.yindexOriginal = correspondY;
+				if(rootNode.width>maxCompositeWidth)maxCompositeWidth = rootNode.width;//得到做大的宽度值
+				maxCompositeHeight = maxCompositeHeight+rootNode.height;               //得到所有 composite interaction 的高度值
+				compositeInteractionParameters.push(rootNode);
+				nodes = [];
+				//alert("");
+			}
+
+			
+			var compositeWidth = roundRadiusComposite*2+maxCompositeWidth+drawCompositeLevel+compositePadding;
+			var compositeHeight = roundRadiusComposite*2+maxCompositeHeight+(interactions.length-2)*compositePadding+compositeInteractionTextLength;
+
+			var startCompositePointX = xdraw+38-compositeWidth/2;//保持要画的框放在中间的位置，关于外边框形式的部分
+			var startCompositePointY = yPrimitive-compositeHeight-20;
+			
+			//画composite interaction外围矩形窗口
+			var compositeRect = document.createElementNS('http://www.w3.org/2000/svg','rect');//在svg  group 加入rect外框
+			compositeRect.setAttribute("x",startCompositePointX);
+			compositeRect.setAttribute("y",startCompositePointY);
+			compositeRect.setAttribute("width",compositeWidth);
+			compositeRect.setAttribute("height",compositeHeight);
+			compositeRect.setAttribute("rx",roundRadiusComposite);
+			compositeRect.setAttribute("ry",roundRadiusComposite);
+			compositeRect.setAttribute("style","fill:rgb(255, 255, 255);stroke-width:1;stroke:rgb(204, 63, 157);display:block");
+			compositeSvgGroup.appendChild(compositeRect);
+
+			var compositeDatumMarkX = startCompositePointX+roundRadiusComposite;//基准x值，关于内容的部分
+			var compositeDatumMarkY = startCompositePointY+roundRadiusComposite;//基准y值
+
+			//在构建的composite interaction框写上说明文字
+			var compositInteractionText=document.createElementNS('http://www.w3.org/2000/svg','text');//在svg  group 加入proclivity
+			compositInteractionText.setAttribute("x",xdraw-20);
+			compositInteractionText.setAttribute("y",compositeDatumMarkY+10);//为了让文字显示好看，加上一个值
+			compositInteractionText.setAttribute("style","font-size: 10px;font-weight: bold;");
+			compositInteractionText.textContent = "Composite interaction";
+			compositeSvgGroup.appendChild(compositInteractionText);
+
+			compositeDatumMarkY = compositeDatumMarkY+compositeInteractionTextLength;
+
+			for(var j=interactions.length-2;j>=0;j--){//interactionlabel, valence,weight,level        
+				var interaction = interactions[j];
+				var informations = interaction.split(":");
+				var learnState = informations[0];//LEANR 与 ENFORCE 
+				var interactionInfos = informations[1].split("_");// <e50e00>_-12_1_1
+
+				defaultmetre = compositeInteractionSize;//画 composite interaction 图片大小尺寸
+				var interactionLevel = parseInt(interactionInfos[3]);
+				var compositeLevelText=document.createElementNS('http://www.w3.org/2000/svg','text');//在svg  group 加入proclivity
+				compositeLevelText.setAttribute("x",compositeDatumMarkX);
+				compositeLevelText.setAttribute("y",compositeDatumMarkY+30);//为了让文字显示好看，加上一个值
+				compositeLevelText.setAttribute("style","font-size: 10px;font-weight: bold;");
+				compositeLevelText.textContent = "layer: "+interactionLevel;
+				compositeSvgGroup.appendChild(compositeLevelText);
+				
+				var interactionInfo = interactionInfos[0];//得到了 composite interaction 当中的 interaction 的字符串
+				var rootNode = compositeInteractionParameters[j];
+				//alert(rootNode.xindex - rootNode.xindexOriginal);
+				var startDrawCompositeX = compositeDatumMarkX+drawCompositeLevel+compositePadding+(rootNode.xindexOriginal - rootNode.xindex);
+				var startDrawCompositeY = compositeDatumMarkY+(rootNode.yindexOriginal - rootNode.yindex);
+				//开始构建nodes，这个方法在这里需要拆分，注意其中涉及到的几个变量。
+				nodes = drawInteraction(interactionInfo);
+				drawNodes(compositeSvgGroup,learnState,nodes,startDrawCompositeX,startDrawCompositeY,0,1);//在 composite interaction svg 上画
+				nodes = [];
+
+				compositeDatumMarkX = startCompositePointX+roundRadiusComposite;
+				compositeDatumMarkY = compositeDatumMarkY+rootNode.height+compositePadding;
+			}
+
+
+		}
+	}
+	
+	//console.log(compositeInteractionSvg);
+
+	defaultmetre = 50;
+	//draw primitive intended interaction and enacted interaction
+	var intendedInteraction = "e"+actionType+drawResult;
+	var enactedInteraction  = "e"+actionType+resultString;
+	var img1 = document.getElementById(interactionImages[intendedInteraction]);
+	var img2 = document.getElementById(interactionImages[enactedInteraction]);
+	//ctx.drawImage(img1,xdraw,yPrimitive,defaultmetre,defaultmetre);
+	drawSvgImage(svg,xdraw,yPrimitive,defaultmetre,defaultmetre,img1.getAttribute("src"));
+	//ctx.drawImage(img2,xdraw+innerDist/2,yPrimitive+innerDist/2,defaultmetre,defaultmetre);
+	drawSvgImage(svg,xdraw+innerDist/2,yPrimitive+innerDist/2,defaultmetre,defaultmetre,img2.getAttribute("src"));
+
+	//在完成底层的intended interaction与enacted interaction之后,需要隐式的画出anticipation string，在触发的时候直接显示出来
+	//<e01e01>_10|e11_0|e21_0|e30_0|e40_0|e50_0|e01_-5|<e01e00>_-5|<<e01e00>e21>_-8|<e00e21>_-13| 这块内容需要好好想想
+	//drawAnticipationString
+
+	if(drawAnticipationString != "")drawAnticipation(xdraw,yPrimitive,loopNum,drawAnticipationString);
+	drawEventArea(svg,xdraw,yPrimitive,defaultmetre+innerDist/2,defaultmetre+innerDist/2,loopNum);
+
+	//ctx.strokeText(loopNum, xdraw+interval/2, yPrimitive+3*interval/2);
+	//ctx.strokeText(enactedValence, xdraw+interval/2, yPrimitive+4*interval/2);
+	var loopNumWidth = 0;
+
+	var intendedEnactedCompositeInteractionDiv = document.getElementById("intendedEnactedCompositeInteractionDiv");
+	
+	/*
+	if(loopNum>=119){
+		alert("isInEnaComInteraction:"+isInEnaComInteraction+" isFirstEnaComInteraction:"+isFirstEnaComInteraction+" isFinishString:"+isFinishString);
+	}*/
+	
+
+	//将绘制composite interaction与 绘制 intended composite interaction 与 enacted composite interaction 区分出来
+	//在画上loopNum的时候，状态isInEnaComInteraction将 intend primitive interaction的情形与 intend composite interaction的情形区分开来
+	if(isInEnaComInteraction == "yes"){//正在enacted composite interaction当中  
+		if(isFirstEnaComInteraction == "yes" &&isFinishString == "no"){//第一次，但是还没有完成
+			var enactedCompositeGroup = document.createElementNS('http://www.w3.org/2000/svg','g'); //创建 svg group
+			enactedCompositeGroup.setAttribute("id","enactedCompositeGroup"+loopNum);
+			enactedCompositeGroup.setAttribute("style","display:block");
+			svg.appendChild(enactedCompositeGroup);
+			previousInteractionIndex = xdraw;
+			loopNumWidth = interval+innerDist/2;
+			drawEventAreaStepRect(enactedCompositeGroup,(xdraw+loopNumWidth/2)-30,(yPrimitive+4*interval/2)-20,60,30,loopNum);
+			drawSvgText(enactedCompositeGroup,loopNum, xdraw+(loopNumWidth/2)-10, yPrimitive+4*interval/2);//没有在enact composite interaction当中
+			drawEventAreaStep(enactedCompositeGroup,(xdraw+loopNumWidth/2)-30,(yPrimitive+4*interval/2)-20,60,30,loopNum);
+
+			//准备intended enacted div图层，svg内容
+			nodes =[];
+			var enactCorrespondX = xdraw;
+			var enactCorrespondY = yPrimitive;
+			defaultmetre = compositeInteractionSize;//30
+			nodes = drawInteraction(enactComIntString.split("_")[0]);//enacted composite interaction的串
+			drawNodes(temporarySvg,"LEARN",nodes,enactCorrespondX,enactCorrespondY,0,2);//0参数表示图形没有缩小，2表示不用画出来。
+			var rootNode = nodes[0];
+			rootNode.xindexOriginal = enactCorrespondX;
+			rootNode.yindexOriginal = enactCorrespondY;
+			var distanceFromOriginX = rootNode.xindexOriginal - rootNode.xindex;
+			var distanceFromOriginY = rootNode.yindexOriginal - rootNode.yindex;
+			var maxEnactCompositeWidth = rootNode.width;
+			var maxEnactCompositeHeight = rootNode.height;
+			nodes = [];
+
+			//svg框的尺寸
+			var enactCompositeWidth = roundRadiusComposite*2+maxEnactCompositeWidth+drawEnactedCompositeText+compositePadding;//drawCompositeText 100, padding 10 
+			var enactCompositeHeight = roundRadiusComposite*2+maxEnactCompositeHeight*2+1*compositePadding;
+
+			//开始画点的大坐标
+			var startEnactCompositePointX = xdraw+(loopNumWidth/2)-enactCompositeWidth/2;//保持要画的框放在中间的位置，关于外边框形式的部分
+			var startEnactCompositePointY = yPrimitive-enactCompositeHeight-20;
+			startEnactedPoint = parseInt(startEnactCompositePointX);//将开始画点保存起来
+			
+			//获得所需的坐标之后，创建intended enacted 的div
+			var divIntendedEnacted = document.createElement("div");
+			divIntendedEnacted.style = "border:0px solid blue;overflow:auto;display:none;"
+			divIntendedEnacted.id = "divIntendedEnacted"+loopNum;
+			divIntendedEnacted.style.position = "absolute";
+			divIntendedEnacted.style.left = startEnactCompositePointX+"px";
+			divIntendedEnacted.style.top = startEnactCompositePointY+"px";
+			divIntendedEnacted.style.width = enactCompositeWidth+"px";
+			divIntendedEnacted.style.height = enactCompositeHeight+"px";
+			intendedEnactedCompositeInteractionDiv.appendChild(divIntendedEnacted);
+
+			//创建intended enacted的svg，将svg放在小div当中
+			var enactedCompositeInteractionGroup = document.createElementNS('http://www.w3.org/2000/svg','svg'); //创建 svg group
+			enactedCompositeInteractionGroup.setAttribute("id","enactedCompositeInteractionGroup"+loopNum);
+			enactedCompositeInteractionGroup.setAttribute("width",enactCompositeWidth);
+			enactedCompositeInteractionGroup.setAttribute("height",enactCompositeHeight);
+			enactedCompositeInteractionGroup.setAttribute("style","display:none");
+			divIntendedEnacted.appendChild(enactedCompositeInteractionGroup);
+			
+			startEnactCompositePointX = 0;
+			startEnactCompositePointY = 0;
+			//画composite interaction外围矩形窗口
+			var enactCompositeRect = document.createElementNS('http://www.w3.org/2000/svg','rect');//在svg  group 加入rect外框
+			enactCompositeRect.setAttribute("x",startEnactCompositePointX);
+			enactCompositeRect.setAttribute("y",startEnactCompositePointY);
+			enactCompositeRect.setAttribute("width",enactCompositeWidth);
+			enactCompositeRect.setAttribute("height",enactCompositeHeight);
+			enactCompositeRect.setAttribute("rx",roundRadiusComposite);
+			enactCompositeRect.setAttribute("ry",roundRadiusComposite);
+			enactCompositeRect.setAttribute("style","fill:rgb(255, 255, 255);stroke-width:1;stroke:rgb(204, 63, 157);display:block");
+			enactedCompositeInteractionGroup.appendChild(enactCompositeRect);
+
+			var enactCompositeDatumMarkX = startEnactCompositePointX+roundRadiusComposite;//基准x值，关于内容的部分
+			var enactCompositeDatumMarkY = startEnactCompositePointY+roundRadiusComposite;//基准y值
+
+			var intendedCompositeText=document.createElementNS('http://www.w3.org/2000/svg','text');//在svg  group 加入proclivity
+			intendedCompositeText.setAttribute("x",enactCompositeDatumMarkX);
+			intendedCompositeText.setAttribute("y",enactCompositeDatumMarkY+25);//为了让文字显示好看，加上一个值
+			intendedCompositeText.setAttribute("style","font-size: 10px;font-weight: bold;");
+			intendedCompositeText.textContent = "Intended composite interaction:";
+			enactedCompositeInteractionGroup.appendChild(intendedCompositeText);
+			
+			//开始画intended composite interaction，准备坐标点信息
+			var startDrawEnactCompositeX = enactCompositeDatumMarkX+drawEnactedCompositeText+compositePadding+distanceFromOriginX;
+			var startDrawEnactCompositeY = enactCompositeDatumMarkY+distanceFromOriginY;
+			//开始构建nodes，这个方法在这里需要拆分，注意其中涉及到的几个变量。
+			
+			defaultmetre = compositeInteractionSize;//30
+			nodes = drawInteraction(enactComIntString.split("_")[0]);
+			drawNodes(enactedCompositeInteractionGroup,"LEARN",nodes,startDrawEnactCompositeX,startDrawEnactCompositeY,0,1);//在 composite interaction svg 上画
+			nodes = [];
+
+			//开始下一行的  enacted  composite interaction的画，先确定这一行的坐标值
+			enactCompositeDatumMarkX = startEnactCompositePointX+roundRadiusComposite;//x坐标值
+			enactCompositeDatumMarkY = enactCompositeDatumMarkY+maxEnactCompositeHeight+compositePadding;
+			var intendedCompositeTextNew=document.createElementNS('http://www.w3.org/2000/svg','text');//在svg  group 加入proclivity
+			intendedCompositeTextNew.setAttribute("x",enactCompositeDatumMarkX);
+			intendedCompositeTextNew.setAttribute("y",enactCompositeDatumMarkY+25);//为了让文字显示好看，加上一个值
+			intendedCompositeTextNew.setAttribute("style","font-size: 10px;font-weight: bold;");
+			intendedCompositeTextNew.textContent = "Enacted composite interaction:";
+			enactedCompositeInteractionGroup.appendChild(intendedCompositeTextNew);
+
+			//enacted composite  interaction的开始点坐标值，现在缺distanceFromOriginX distanceFromOriginY这两部分信息
+			enactedCompositeInteractionStartPointX = enactCompositeDatumMarkX+drawEnactedCompositeText+compositePadding;
+			enactedCompositeInteractionStartPointY = enactCompositeDatumMarkY;
+			
+
+		
+		}else if(isFirstEnaComInteraction == "no" &&isFinishString == "no"){//第二个及后续的interaction，但是整个enacted composite interaction尚未完成
+			//删除刚开始的节点
+			var enactedCompositeGroup = document.getElementById("enactedCompositeGroup"+loopNum);
+			svg.removeChild(enactedCompositeGroup);
+
+
+
+			//创建loopNum及其感受区
+			var enactedCompositeGroupNew = document.createElementNS('http://www.w3.org/2000/svg','g'); //创建 svg group
+			enactedCompositeGroupNew.setAttribute("id","enactedCompositeGroup"+loopNum);
+			enactedCompositeGroupNew.setAttribute("style","display:block");
+			svg.appendChild(enactedCompositeGroupNew);
+			loopNumWidth = xdraw+interval+innerDist/2-previousInteractionIndex;
+			var enactedLoopNumCenterPoint = previousInteractionIndex+loopNumWidth/2;
+			drawEventAreaStepRect(enactedCompositeGroupNew,(enactedLoopNumCenterPoint)-30,(yPrimitive+4*interval/2)-20,60,30,loopNum);
+			drawSvgText(enactedCompositeGroupNew,loopNum,enactedLoopNumCenterPoint-10, yPrimitive+4*interval/2);//没有在enact composite interaction当中
+			drawEventAreaStep(enactedCompositeGroupNew,(enactedLoopNumCenterPoint)-30,(yPrimitive+4*interval/2)-20,60,30,loopNum);
+			
+			//移动intend enacted div
+			var divIntendedEnacted = document.getElementById("divIntendedEnacted"+loopNum);
+			startEnactedPoint = startEnactedPoint+parseInt((interval+innerDist)/2);
+			divIntendedEnacted.style.left = startEnactedPoint+"px";
+
+			//enactedCompositeInteractionStartPointX = enactedCompositeInteractionStartPointX+parseInt((interval+innerDist)/2);
+		
+		}else if(isFinishString == "yes"){//完成执行enacted composite interaction testici
+			if(isFirstEnaComInteraction == "no"){//后续的节点执行之后，结束了enacted composite interaction的过程，在原有坐标基础上画上enacted result
+				var enactedCompositeGroup = document.getElementById("enactedCompositeGroup"+loopNum);
+				svg.removeChild(enactedCompositeGroup);
+
+				var enactedCompositeGroupNew = document.createElementNS('http://www.w3.org/2000/svg','g'); //创建 svg group
+				enactedCompositeGroupNew.setAttribute("id","enactedCompositeGroup"+loopNum);
+				enactedCompositeGroupNew.setAttribute("style","display:block");
+				svg.appendChild(enactedCompositeGroupNew);
+				
+				loopNumWidth = xdraw+interval+innerDist/2-previousInteractionIndex;
+				drawPriIntEnactRect(svg,previousInteractionIndex-primIntEnactRectPadding,yPrimitive-primIntEnactRectPadding,loopNumWidth+2*primIntEnactRectPadding,68);
+				var enactedLoopNumCenterPoint = previousInteractionIndex+loopNumWidth/2;
+				previousInteractionIndex = 0;
+
+				
+				drawEventAreaStepRect(enactedCompositeGroupNew,(enactedLoopNumCenterPoint)-30,(yPrimitive+4*interval/2)-20,60,30,loopNum);
+				drawSvgText(enactedCompositeGroupNew,loopNum, enactedLoopNumCenterPoint-10, yPrimitive+4*interval/2);//没有在enact composite interaction当中
+				drawEventAreaStep(enactedCompositeGroupNew,(enactedLoopNumCenterPoint)-30,(yPrimitive+4*interval/2)-20,60,30,loopNum);
+
+
+				var divIntendedEnacted = document.getElementById("divIntendedEnacted"+loopNum);
+				startEnactedPoint = startEnactedPoint+parseInt((interval+innerDist)/2);
+				divIntendedEnacted.style.left = startEnactedPoint+"px";
+				startEnactedPoint = 0;
+
+				//画满了intended enacted composite interaction的svg
+				var enactedCompositeInteractionGroup = document.getElementById("enactedCompositeInteractionGroup"+loopNum);
+				//画enacted composite interaction
+				nodes =[];
+				var enactCorrespondX = xdraw;
+				var enactCorrespondY = yPrimitive;
+				defaultmetre = compositeInteractionSize;//30
+				nodes = drawInteraction(resultEnactComIntString.split("_")[0]);//enacted composite interaction的串
+				drawNodes(temporarySvg,"LEARN",nodes,enactCorrespondX,enactCorrespondY,0,2);//0参数表示图形没有缩小，2表示不用画出来。
+				var rootNodeEnacted = nodes[0];
+				rootNodeEnacted.xindexOriginal = enactCorrespondX;
+				rootNodeEnacted.yindexOriginal = enactCorrespondY;
+				var distanceEnactedFromOriginX = rootNodeEnacted.xindexOriginal - rootNodeEnacted.xindex;
+				var distanceEnactedFromOriginY = rootNodeEnacted.yindexOriginal - rootNodeEnacted.yindex;
+				nodes = [];
+				
+				var startDrawEnactCompositeX = enactedCompositeInteractionStartPointX+distanceEnactedFromOriginX;
+				var startDrawEnactCompositeY = enactedCompositeInteractionStartPointY+distanceEnactedFromOriginY;
+				//alert(startDrawEnactCompositeX+" "+startDrawEnactCompositeY);
+				//开始构建nodes，这个方法在这里需要拆分，注意其中涉及到的几个变量。
+				defaultmetre = compositeInteractionSize;//30
+				nodes = drawInteraction(resultEnactComIntString.split("_")[0]);
+				drawNodes(enactedCompositeInteractionGroup,"LEARN",nodes,startDrawEnactCompositeX,startDrawEnactCompositeY,0,1);//在 composite interaction svg 上画
+				nodes = [];
+
+				enactedCompositeInteractionStartPointX = 0;
+				enactedCompositeInteractionStartPointY = 0;
+
+			}else if(isFirstEnaComInteraction == "yes"){//刚开始执行enacted composite interaction即遇到问题。需要在这里画出所有内容
+				var enactedCompositeGroup = document.createElementNS('http://www.w3.org/2000/svg','g'); //创建 svg group
+				enactedCompositeGroup.setAttribute("id","enactedCompositeGroup"+loopNum);
+				enactedCompositeGroup.setAttribute("style","display:block");
+				svg.appendChild(enactedCompositeGroup);
+				loopNumWidth = interval+innerDist/2;
+
+				drawPriIntEnactRect(svg,xdraw-primIntEnactRectPadding,yPrimitive-primIntEnactRectPadding,68,68);
+				drawEventAreaStepRect(enactedCompositeGroup,(xdraw+loopNumWidth/2)-30,(yPrimitive+4*interval/2)-20,60,30,loopNum);
+				drawSvgText(enactedCompositeGroup,loopNum, xdraw+(loopNumWidth/2)-10, yPrimitive+4*interval/2);//没有在enact composite interaction当中
+				drawEventAreaStep(enactedCompositeGroup,(xdraw+loopNumWidth/2)-30,(yPrimitive+4*interval/2)-20,60,30,loopNum);
+
+				//在temporarySvg上测量尺寸
+				nodes =[];
+				var enactCorrespondX = xdraw;
+				var enactCorrespondY = yPrimitive;
+				defaultmetre = compositeInteractionSize;//30
+				nodes = drawInteraction(enactComIntString.split("_")[0]);//enacted composite interaction的串
+				drawNodes(temporarySvg,"LEARN",nodes,enactCorrespondX,enactCorrespondY,0,2);//0参数表示图形没有缩小，2表示不用画出来。
+				var rootNode = nodes[0];
+				rootNode.xindexOriginal = enactCorrespondX;
+				rootNode.yindexOriginal = enactCorrespondY;
+				var distanceFromOriginX = rootNode.xindexOriginal - rootNode.xindex;
+				var distanceFromOriginY = rootNode.yindexOriginal - rootNode.yindex;
+				var maxEnactCompositeWidth = rootNode.width;
+				var maxEnactCompositeHeight = rootNode.height;
+				nodes = [];
+
+				//svg框的尺寸
+				var enactCompositeWidth = roundRadiusComposite*2+maxEnactCompositeWidth+drawEnactedCompositeText+compositePadding;//drawCompositeText 100, padding 10 
+				var enactCompositeHeight = roundRadiusComposite*2+maxEnactCompositeHeight*2+1*compositePadding;
+
+				//开始画点的大坐标
+				var startEnactCompositePointX = xdraw+(loopNumWidth/2)-enactCompositeWidth/2;//保持要画的框放在中间的位置，关于外边框形式的部分
+				var startEnactCompositePointY = yPrimitive-enactCompositeHeight-20;
+				startEnactedPoint = parseInt(startEnactCompositePointX);//将开始画点保存起来
+				
+				
+				//获得所需的坐标之后，创建小div
+				var divIntendedEnacted = document.createElement("div");
+				divIntendedEnacted.style = "border:0px solid blue;overflow:auto;display:none;"
+				divIntendedEnacted.id = "divIntendedEnacted"+loopNum;
+				divIntendedEnacted.style.position = "absolute";
+				divIntendedEnacted.style.left = startEnactCompositePointX+"px";
+				divIntendedEnacted.style.top = startEnactCompositePointY+"px";
+				divIntendedEnacted.style.width = enactCompositeWidth+"px";
+				divIntendedEnacted.style.height = enactCompositeHeight+"px";
+				intendedEnactedCompositeInteractionDiv.appendChild(divIntendedEnacted);
+
+				//创建svg，将其放在小div当中
+				var enactedCompositeInteractionGroup = document.createElementNS('http://www.w3.org/2000/svg','svg'); //创建 svg group
+				enactedCompositeInteractionGroup.setAttribute("id","enactedCompositeInteractionGroup"+loopNum);
+				enactedCompositeInteractionGroup.setAttribute("x",0);
+				enactedCompositeInteractionGroup.setAttribute("y",0);
+				enactedCompositeInteractionGroup.setAttribute("width",enactCompositeWidth);
+				enactedCompositeInteractionGroup.setAttribute("height",enactCompositeHeight);
+				enactedCompositeInteractionGroup.setAttribute("style","display:none");
+				divIntendedEnacted.appendChild(enactedCompositeInteractionGroup);
+				
+				startEnactCompositePointX = 0;
+				startEnactCompositePointY = 0;
+				//画composite interaction外围矩形窗口
+				var enactCompositeRect = document.createElementNS('http://www.w3.org/2000/svg','rect');//在svg  group 加入rect外框
+				enactCompositeRect.setAttribute("x",startEnactCompositePointX);
+				enactCompositeRect.setAttribute("y",startEnactCompositePointY);
+				enactCompositeRect.setAttribute("width",enactCompositeWidth);
+				enactCompositeRect.setAttribute("height",enactCompositeHeight);
+				enactCompositeRect.setAttribute("rx",roundRadiusComposite);
+				enactCompositeRect.setAttribute("ry",roundRadiusComposite);
+				enactCompositeRect.setAttribute("style","fill:rgb(255, 255, 255);stroke-width:1;stroke:rgb(204, 63, 157);display:block");
+				enactedCompositeInteractionGroup.appendChild(enactCompositeRect);
+
+				//开始画的基准值
+				var enactCompositeDatumMarkX = startEnactCompositePointX+roundRadiusComposite;//基准x值，关于内容的部分
+				var enactCompositeDatumMarkY = startEnactCompositePointY+roundRadiusComposite;//基准y值
+
+				var intendedCompositeText=document.createElementNS('http://www.w3.org/2000/svg','text');//在svg  group 加入proclivity
+				intendedCompositeText.setAttribute("x",enactCompositeDatumMarkX);
+				intendedCompositeText.setAttribute("y",enactCompositeDatumMarkY+25);//为了让文字显示好看，加上一个值
+				intendedCompositeText.setAttribute("style","font-size: 10px;font-weight: bold;");
+				intendedCompositeText.textContent = "Intended composite interaction:";
+				enactedCompositeInteractionGroup.appendChild(intendedCompositeText);
+				
+				//开始画intended composite interaction，准备坐标点信息
+				var startDrawEnactCompositeX = enactCompositeDatumMarkX+drawEnactedCompositeText+compositePadding+distanceFromOriginX;
+				var startDrawEnactCompositeY = enactCompositeDatumMarkY+distanceFromOriginY;
+				//开始构建nodes，这个方法在这里需要拆分，注意其中涉及到的几个变量。
+				
+				defaultmetre = compositeInteractionSize;//30
+				nodes = drawInteraction(enactComIntString.split("_")[0]);
+				drawNodes(enactedCompositeInteractionGroup,"LEARN",nodes,startDrawEnactCompositeX,startDrawEnactCompositeY,0,1);//在 composite interaction svg 上画
+				nodes = [];
+
+				//开始下一行的  enacted  composite interaction的画，先确定这一行的坐标值
+				enactCompositeDatumMarkX = startEnactCompositePointX+roundRadiusComposite;//x坐标值
+				enactCompositeDatumMarkY = enactCompositeDatumMarkY+maxEnactCompositeHeight+compositePadding;
+				
+				var intendedCompositeTextNew=document.createElementNS('http://www.w3.org/2000/svg','text');//在svg  group 加入proclivity
+				intendedCompositeTextNew.setAttribute("x",enactCompositeDatumMarkX);
+				intendedCompositeTextNew.setAttribute("y",enactCompositeDatumMarkY+25);//为了让文字显示好看，加上一个值
+				intendedCompositeTextNew.setAttribute("style","font-size: 10px;font-weight: bold;");
+				intendedCompositeTextNew.textContent = "Enacted composite interaction:";
+				enactedCompositeInteractionGroup.appendChild(intendedCompositeTextNew);
+
+
+				//在temporarySvg上测量尺寸
+				nodes =[];
+				defaultmetre = compositeInteractionSize;//30
+				nodes = drawInteraction(resultEnactComIntString.split("_")[0]);//enacted composite interaction的串
+				drawNodes(temporarySvg,"LEARN",nodes,enactCorrespondX,enactCorrespondY,0,2);//0参数表示图形没有缩小，2表示不用画出来。
+				var rootNodeEnacted = nodes[0];
+				rootNodeEnacted.xindexOriginal = enactCorrespondX;
+				rootNodeEnacted.yindexOriginal = enactCorrespondY;
+				var distanceEnactedFromOriginX = rootNodeEnacted.xindexOriginal - rootNodeEnacted.xindex;
+				var distanceEnactedFromOriginY = rootNodeEnacted.yindexOriginal - rootNodeEnacted.yindex;
+				nodes = [];
+
+				var startDrawEnactCompositeX = enactCompositeDatumMarkX+drawEnactedCompositeText+compositePadding+distanceEnactedFromOriginX;
+				var startDrawEnactCompositeY = enactCompositeDatumMarkY+distanceEnactedFromOriginY;
+
+				defaultmetre = compositeInteractionSize;//30
+				nodes = drawInteraction(resultEnactComIntString.split("_")[0]);
+				drawNodes(enactedCompositeInteractionGroup,"LEARN",nodes,startDrawEnactCompositeX,startDrawEnactCompositeY,0,1);//在 composite interaction svg 上画
+				nodes = [];
+			}
+
+		}
+		//console.log(intendedEnactedCompositeInteractionDiv);
+	}else{//没有在enact composite interaction 当中，则正常显示
+		drawSvgText(svg,loopNum, xdraw+interval/2, yPrimitive+4*interval/2);
+	}
+	
+	
+	//drawSvgText(svg,loopNum, xdraw+interval/2, yPrimitive+4*interval/2);
+	//drawEventAreaStep(svg,(xdraw+interval/2)-30,(yPrimitive+4*interval/2)-20,60,30,loopNum);
+	//显示本次交互的valence
+	drawSvgText(svg,enactedValence, xdraw+interval/2, yPrimitive+5*interval/2);//valence在页面当中的显示
+	
+
+	xdraw = xdraw+innerDist+interval;
+
+	if(xdraw>1000){
+		svg.setAttribute("width",xdraw);
+		anticipationSvgId.setAttribute("width",xdraw);
+		compositeInteractionSvg.setAttribute("width",xdraw);
+		temporarySvg.setAttribute("width",xdraw);
+		intendedEnactedCompositeInteractionSVG.setAttribute("width",xdraw);
+
+		var div = document.getElementById('scrolldiv');
+		div.scrollLeft  = xdraw;
+	}
+	
+	//var div = document.getElementById("showpixels");
+    //div.innerHTML = xdraw;
+}
+
+function drawInteraction(interactionInfo){
+	var nodeId = 1;
+	var layer = 1;
+	var nodeStack = [];
+	var mainNode = new Node(interactionInfo);
+	nodes.push(mainNode);
+	nodeStack.push(mainNode);
+	while(nodeStack.length !=0){
+		var upperNode = nodeStack.pop();
+		upperNode.layer = layer;
+		upperNode.nodeId = nodeId;
+		layer++;
+		nodeId++;//最后的一个id为最右边的节点
+		var upperNodeString = upperNode.infoString;
+		var subUpperString = "";
+		if(upperNodeString[0] == "<"){
+			subUpperString = upperNodeString.substring(1,upperNodeString.length-1);
+		}else{
+			subUpperString = upperNodeString;
+		}
+		if(isHaveMark(subUpperString)){
+			var leftMark = [];
+			var rightMark = [];
+			var isFirstLetter = false;
+			var inervalPoint = 0;
+			for(var j=0;j<subUpperString.length;j++){
+				var charString = subUpperString[j];
+				if(j==0 && charString != "<"){//第一个字符非"<"的情形
+					isFirstLetter = true;
+				}else{
+					if(isFirstLetter){
+						if(charString == "<"){
+							inervalPoint = j;
+							isFirstLetter = false;
+							break;
+						}
+					}else{//第一个字符是"<"的情形
+						if(charString == "<"){
+							leftMark.push(j);
+						}else if(charString == ">"){
+							leftMark.pop();
+							if(leftMark.length == 0){
+								inervalPoint = j+1;
+								//alert("the interval point position is: "+inervalPoint);
+								break;
+							}
+						}
+					}
+				}
+			}
+			var rightString = subUpperString.substring(inervalPoint,subUpperString.length);
+			var rightNode = new Node(rightString);
+			rightNode.upperNode = upperNode;
+			rightNode.upperNodeDirection = "right";
+			nodeStack.push(rightNode);
+			nodes.push(rightNode);
+			upperNode.rightNode = rightNode;
+
+			var leftString = subUpperString.substring(0,inervalPoint);
+			var leftNode = new Node(leftString);
+			leftNode.upperNode = upperNode;
+			leftNode.upperNodeDirection = "left";
+			nodeStack.push(leftNode);
+			nodes.push(leftNode);
+			upperNode.leftNode = leftNode;
+			//alert("left: "+leftString+"  right:"+rightString);
+		}else{
+			upperNode.leftNode=null;
+			upperNode.rightNode = null;
+		}
+	}
+	for(var smallNode in nodes){
+		if(nodes[smallNode].nodeId == nodes.length){
+			nodes[smallNode].isLast = true;
+		}
+	}
+	return nodes;
+}
+
+
+function AnticipationNode(proclivity,weight){
+	this.interactions = [];
+	this.interaction = "";
+	this.proclivity = proclivity;
+	this.weight = weight;
+	this.detailAntiString = "";
+	
+}
+
+var roundRadius = 20;
+var proclivityWidth = 75;
+var proclivityWidthDetail = 100;
+var antiImageSize = 30;
+var antiarginpadding = 6;
+function drawAnticipation(x,y,id,drawAnticipationString){
+	//e11_0|e21_0|e30_0|e40_0|e50_-5.e50_-1.<e50e11>_-4.|e01_-10.e01_-10.| 这块内容需要好好想想
+	//e11_18,<e11<e01e01>>_14.<<e11<e01e01>>e21>_4.|e21_0|e30_0|e40_0|e50_0|e01_-10,e01_-10.|
+	var listAnticipationsbig = [];
+	var anticipationNodes = [];
+    var ancitipationStrings = drawAnticipationString.split("|");//<<e01e00>e21>_-8
+    var maxInteractionNum = 0;
+    
+	//根据anticipationString的内容，构建形成actionNodeList,如果当前的动作当中有anticipation with composite interaction的情况，将其放入detailAntiString当中
+	for(var i=0;i<ancitipationStrings.length-1;i++){
+        var ancitipationString = ancitipationStrings[i];//e21_0 或者 e50_-5,e50_-1.<e50e11>_-4. or  e01_-10,e01_-10.
+		var antiChectPrimitive = ancitipationString.split(",");
+		if(antiChectPrimitive.length == 1){//单一 primitive default anticipation的情况
+			var anticipationSmalls = ancitipationString.split("_");
+        	var antiInteraction = anticipationSmalls[0];
+        	var proclivity = anticipationSmalls[1];
+			var antiNode = new AnticipationNode(proclivity,0);
+			antiNode.interaction = antiInteraction+"a";
+			anticipationNodes.push(antiNode);
+		}else{//anticipationList不为空的情况
+			var anticipationSmalls = antiChectPrimitive[0].split("_");//e01_-10
+			var antiInteraction = anticipationSmalls[0];
+        	var proclivity = anticipationSmalls[1];
+			var antiNode = new AnticipationNode(proclivity,0);
+			antiNode.interaction = antiInteraction+"a";
+			antiNode.detailAntiString = antiChectPrimitive[1];//e50_-1.<e50e11>_-4.
+			anticipationNodes.push(antiNode);
+		}
+		maxInteractionNum = 1;
+    }
+	
+    //maxInteractionNum+=1;//
+	//alert(maxInteractionNum);
+	var maxiwidth = roundRadius*2+maxInteractionNum*(antiImageSize+antiarginpadding)+proclivityWidth;//左右两个边框 + anticipation中的interaction数目 + 加上proclivity的空间尺寸
+    var maxiheight = roundRadius*2+antiImageSize*(ancitipationStrings.length-1)+antiarginpadding*(ancitipationStrings.length-2)+30;
+    //计算一下显示 anticipations 框的大小
+
+	var startPointX = x+38-maxiwidth/2;
+	var startPointY = y-maxiheight-10;
+
+
+	
+	var anticipationdiv = document.getElementById("anticipationdiv");
+
+	//all div = default div + detail div
+	var divAllAnticipation = document.createElement("div");
+	divAllAnticipation.style = "border:0px solid blue;overflow:auto;display:none;"
+	divAllAnticipation.id = "step"+id;
+	divAllAnticipation.style.position = "absolute";
+	divAllAnticipation.style.left = startPointX+"px";
+	divAllAnticipation.style.top = startPointY+"px";
+	divAllAnticipation.style.width = "520px";
+	divAllAnticipation.style.height = "280px";
+	anticipationdiv.appendChild(divAllAnticipation);
+
+	//default div 
+	var divDefaultAnticipation = document.createElement("div");
+	divDefaultAnticipation.style = "border:0px solid blue;overflow:auto;display:none;"
+	divDefaultAnticipation.id = "step"+id+"divDefault";
+	divDefaultAnticipation.style.position = "absolute";
+	divDefaultAnticipation.style.left = "0px";
+	divDefaultAnticipation.style.top = "0px";
+	divDefaultAnticipation.style.width = "160px";
+	divDefaultAnticipation.style.height = "280px";
+	divAllAnticipation.appendChild(divDefaultAnticipation);
+
+	//创建 画 defaultAnticipation 的 svg
+	var defaultSVG=document.createElementNS('http://www.w3.org/2000/svg','svg'); //创建 detail anticipationList 的 group
+	defaultSVG.setAttribute("id","step"+id+"default");
+	defaultSVG.setAttribute("x",0);
+	defaultSVG.setAttribute("y",0);
+	defaultSVG.setAttribute("width",150);
+	defaultSVG.setAttribute("height",280);
+	defaultSVG.setAttribute("style","display:none;");
+	divDefaultAnticipation.appendChild(defaultSVG);
+
+	//画default svg的圆角矩形边界框
+	var antirect=document.createElementNS('http://www.w3.org/2000/svg','rect');//在svg  group 加入rect外框
+    antirect.setAttribute("x",0);
+    antirect.setAttribute("y",0);
+    antirect.setAttribute("width",150);
+    antirect.setAttribute("height",280);
+	antirect.setAttribute("rx",roundRadius);//20
+	antirect.setAttribute("ry",roundRadius);//20
+	antirect.setAttribute("style","fill:rgb(255, 255, 255);stroke-width:1;stroke:rgb(30, 223, 62);display:block");
+    defaultSVG.appendChild(antirect);
+
+	var antiDatumMarkX = 0+roundRadius;//基准x值
+	var antiDatumMarkY = 0+roundRadius;//基准y值
+
+	var detailActionId = 1;
+	for(var antiNodeIndex in anticipationNodes){
+		//先画文本 Proclivity
+		var text=document.createElementNS('http://www.w3.org/2000/svg','text');//在svg  group 加入proclivity
+		text.setAttribute("x",antiDatumMarkX);
+		text.setAttribute("y",antiDatumMarkY+20);
+		text.setAttribute("style","font-size: 10px;font-weight: bold;");
+		var antiNode = anticipationNodes[antiNodeIndex];
+		text.textContent = "proclivity: "+antiNode.proclivity;
+		defaultSVG.appendChild(text);
+
+		antiDatumMarkX = antiDatumMarkX+proclivityWidth+antiarginpadding;
+
+		var img = document.getElementById(interactionImages[antiNode.interaction]);
+		drawSvgImage(defaultSVG,antiDatumMarkX,antiDatumMarkY,antiImageSize,antiImageSize,img.getAttribute("src"));//画出了default action
+		
+		
+		//画出action相应的感应区域，点击后detail anticipation在右边弹出来
+		var showDetailAnticipationsEvent = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+		showDetailAnticipationsEvent.setAttribute("id","step"+id+"bigaction"+detailActionId);
+		showDetailAnticipationsEvent.setAttribute("x",antiDatumMarkX-2);
+		showDetailAnticipationsEvent.setAttribute("y",antiDatumMarkY-2);
+		showDetailAnticipationsEvent.setAttribute("width",antiImageSize+4);
+		showDetailAnticipationsEvent.setAttribute("height",antiImageSize+4);
+		//画出感应区的显示样式
+		if(antiNode.detailAntiString == ""){
+			showDetailAnticipationsEvent.setAttribute("style","fill:rgba(255,255,255,0.1);stroke-width:0;stroke:rgb(30, 0, 255)");
+		}else{
+			//对于anticipationList 当中存在内容的情况，需要对应的action给出标志，便于区分
+			showDetailAnticipationsEvent.setAttribute("style","fill:rgba(255,255,255,0.1);stroke-width:2;stroke:rgb(233, 128, 210)");
+		}
+		//添加方法
+		showDetailAnticipationsEvent.setAttribute("onclick","showDetailAnticipations("+id+","+detailActionId+")");
+		//showDetailAnticipationsEvent.setAttribute("onclick","showDetailAnticipations("+"\'step"+id+"detail"+detailActionId+"\')");
+		//showDetailAnticipationsEvent.addEventListener("mouseover", function(event){showDetailAnticipations(event,id,antiNode.interaction);}, false);//click
+		defaultSVG.appendChild(showDetailAnticipationsEvent);
+		//console.log(gup);
+		
+		/*
+		var describeimage = document.getElementById(interactionImages["describe"]);
+		//describeimage.setAttribute("id","step"+id+"describeimage"+detailActionId);
+		drawSvgImage(defaultSVG,antiDatumMarkX,antiDatumMarkY,antiImageSize,antiImageSize,describeimage.getAttribute("src"));
+		*/
+		
+		//画出细节框内容
+		if(antiNode.detailAntiString != ""){//  e50_-1.<e50e11>_-4.e01_-10.
+			var detailAntiStrings = antiNode.detailAntiString.split(".");
+			var detailAnticipationNodes = [];
+			var detailMaxInteractionNum = 0;
+			for(var i=0;i<detailAntiStrings.length-1;i++){
+				var detailAntiStringFordrawing = detailAntiStrings[i];
+				//alert(detailAntiStringFordrawing);
+				var detailAnticipationSmalls = detailAntiStringFordrawing.split("_");
+				var detailAntiInteraction = detailAnticipationSmalls[0];
+				var detailProclivity = detailAnticipationSmalls[1];
+				var detailWeight = detailAnticipationSmalls[2];
+				var detailAntiNode = new AnticipationNode(detailProclivity,detailWeight);
+				if(detailAntiInteraction[0] != "<"){//就一个interaction的情况
+					detailAntiNode.interactions.push(detailAntiInteraction);//add default actions
+					if(detailMaxInteractionNum<1)detailMaxInteractionNum = 1;
+				}else{//abstract composite interaction
+					var detailListEIndexs = [];
+					for(var j=0;j<detailAntiInteraction.length;j++){
+						var antichar = detailAntiInteraction[j];
+						if(antichar == "e"){
+							detailListEIndexs.push(j);
+						}
+					}
+					if(detailMaxInteractionNum<detailListEIndexs.length)detailMaxInteractionNum = detailListEIndexs.length;
+					for(var k in detailListEIndexs){
+						var interactionPiece = detailAntiInteraction.substring(detailListEIndexs[k],detailListEIndexs[k]+3);
+						detailAntiNode.interactions.push(interactionPiece);//add the composite interactions
+					}
+				}
+				
+				detailAnticipationNodes.push(detailAntiNode);
+			}
+			
+			//detailAnticipation的内容，首先完成测距，整个圆角矩形的长宽参数
+			var detailmaxiwidth = roundRadius*2+detailMaxInteractionNum*(antiImageSize+antiarginpadding)+proclivityWidth;//左右两个边框 + anticipation中的interaction数目 + 加上proclivity的空间尺寸
+    		var detailmaxiheight = roundRadius*2+antiImageSize*(detailAntiStrings.length-1)+antiarginpadding*(detailAntiStrings.length-2)+30;
+
+			var divDetail=document.createElement("div");
+			divDetail.style = "border:0px solid blue;overflow:auto;display:none;"
+			divDetail.id = "step"+id+"divDetail"+detailActionId;
+			divDetail.style.position = "absolute";
+			divDetail.style.left = "170px";
+			divDetail.style.top = "0px";
+			divDetail.style.width = "350px";
+			divDetail.style.height = "280px";
+			divAllAnticipation.appendChild(divDetail);
+
+			var detailSVG=document.createElementNS('http://www.w3.org/2000/svg','svg'); //创建 detail anticipationList 的 group
+			detailSVG.setAttribute("id","step"+id+"detail"+detailActionId);
+			detailSVG.setAttribute("x",0);
+			detailSVG.setAttribute("y",0);
+			if(detailmaxiwidth<350 && detailmaxiheight>280){
+				detailSVG.setAttribute("width",350);
+			}else{
+				detailSVG.setAttribute("width",detailmaxiwidth);
+			}
+			if(detailmaxiwidth>350 && detailmaxiheight<280){
+				detailSVG.setAttribute("height",280);
+			}else{
+				detailSVG.setAttribute("height",detailmaxiheight);
+			}
+			
+			detailSVG.setAttribute("style","display:none;");
+			divDetail.appendChild(detailSVG);
+
+			var detailantirect=document.createElementNS('http://www.w3.org/2000/svg','rect');//在detail anticipation的group 中加入rect外框
+			detailantirect.setAttribute("x",0);
+			detailantirect.setAttribute("y",0);
+			if(detailmaxiwidth<350 && detailmaxiheight>280){
+				detailantirect.setAttribute("width",350);
+			}else{
+				detailantirect.setAttribute("width",detailmaxiwidth);
+			}
+			if(detailmaxiwidth>350 && detailmaxiheight<280){
+				detailantirect.setAttribute("height",280);
+			}else{
+				detailantirect.setAttribute("height",detailmaxiheight);
+			}
+			detailantirect.setAttribute("rx",roundRadius);
+			detailantirect.setAttribute("ry",roundRadius);
+			detailantirect.setAttribute("style","fill:rgb(255, 255, 255);stroke-width:1;stroke:rgb(30, 223, 62);display:block");
+			detailSVG.appendChild(detailantirect);
+
+			var detailantiDatumMarkX = 0+roundRadius;//detail基准x值
+			var detailantiDatumMarkY = 0+roundRadius;//detail基准y值
+			for(var detailantiNodeIndex in detailAnticipationNodes){
+				var detailantiNode = detailAnticipationNodes[detailantiNodeIndex];
+				var compositeWeight = parseInt(detailantiNode.weight);
+				
+
+				var detailtext=document.createElementNS('http://www.w3.org/2000/svg','text');//在svg  group 加入proclivity
+				detailtext.setAttribute("x",detailantiDatumMarkX);
+				detailtext.setAttribute("y",detailantiDatumMarkY+20);//文字添加20，会让显示更加美观
+				if(compositeWeight >= 4 ){
+					detailtext.setAttribute("style","font-size: 10px;font-weight: bold;fill:rgb(73, 243, 21);");
+				}else{
+					detailtext.setAttribute("style","font-size: 10px;font-weight: bold;fill:rgb(233, 90, 90);");
+				}
+				detailtext.textContent = "proclivity: "+detailantiNode.proclivity;
+				//+" weight:"+detailantiNode.weight
+				detailSVG.appendChild(detailtext);
+
+				detailantiDatumMarkX = detailantiDatumMarkX+proclivityWidth+antiarginpadding;
+				var detailantiInteractions = detailantiNode.interactions;
+				for(var interactionPiece in detailantiInteractions){
+					var anticipationInteraction = detailantiInteractions[interactionPiece];
+					var img = document.getElementById(interactionImages[anticipationInteraction]);
+					drawSvgImage(detailSVG,detailantiDatumMarkX,detailantiDatumMarkY,antiImageSize,antiImageSize,img.getAttribute("src"));
+					detailantiDatumMarkX = detailantiDatumMarkX+antiImageSize+antiarginpadding;
+				}
+				detailantiDatumMarkX = 0+roundRadius;
+				detailantiDatumMarkY = detailantiDatumMarkY+antiImageSize+antiarginpadding;
+			}
+			
+		}
+		
+		detailActionId++;
+		antiDatumMarkX = 0+roundRadius;
+		antiDatumMarkY = antiDatumMarkY+antiImageSize+antiarginpadding;
+	}
+	//detailid++;
+
+
+	//关闭按钮 感应区和相应的动作
+	var closeimage = document.getElementById(interactionImages["close"]);
+	drawSvgImage(defaultSVG,55,antiDatumMarkY+antiarginpadding,40,20,closeimage.getAttribute("src"));
+	//关闭按钮的响应
+	var closeEvent = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    closeEvent.setAttribute("x",55);
+    closeEvent.setAttribute("y",antiDatumMarkY+antiarginpadding);
+    closeEvent.setAttribute("width",40);
+    closeEvent.setAttribute("height",20);
+	closeEvent.setAttribute("style","fill:rgba(255,255,255,0.1);stroke-width:0;stroke:rgb(30, 0, 255)");
+	closeEvent.addEventListener("click", function(event){closeBigAnticipations(event,id);}, false);//click
+    defaultSVG.appendChild(closeEvent);
+
+	
+	//alert(gup.innerHTML);
+}
+
+function drawSvgRect(svg,learnState,x,y,width,height){
+	var rect=document.createElementNS('http://www.w3.org/2000/svg','rect'); 
+    rect.setAttribute("x",x);
+    rect.setAttribute("y",y);
+    rect.setAttribute("width",width);
+    rect.setAttribute("height",height);
+	if(learnState == "LEARN"){
+		rect.setAttribute("style","fill:none;stroke-width:1;stroke:rgb(30, 223, 62)");
+	}else if(learnState == "REINFORCE"){
+		rect.setAttribute("style","fill:none;stroke-width:1;stroke:rgb(30, 0, 255)");
+	}
+    svg.appendChild(rect);
+}
+
+function drawSvgImage(svg,x,y,width,height,href){
+	//alert(x+" "+y+" "+width+" "+height+" "+href+" ");
+	var image1 = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+    image1.setAttribute("x",x);
+    image1.setAttribute("y",y);
+	image1.setAttribute("href",href);
+    image1.setAttribute("width",width);
+    image1.setAttribute("height",height);
+    svg.appendChild(image1);
+}
+
+function drawEventArea(svg,x,y,width,height,id){
+	var imageEvent = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    imageEvent.setAttribute("x",x);
+    imageEvent.setAttribute("y",y);
+    imageEvent.setAttribute("width",width);
+    imageEvent.setAttribute("height",height);
+	imageEvent.setAttribute("style","fill:rgba(255,255,255,0.1);stroke-width:0;stroke:rgb(30, 0, 255)");
+
+	//var anticipationId = "step"+id;
+	//var compositeId = "compositeGroup"+id;
+	imageEvent.addEventListener("mouseover", function(event){reactEvent(event,id);}, false);//mouseover
+	imageEvent.addEventListener("click", function(event){clickTheEvent(event,id);}, false);//click
+    imageEvent.addEventListener("mouseout", function(event){unreactEvent(event,id);}, false);//mouseout
+    svg.appendChild(imageEvent);
+}
+
+
+function drawEventAreaStepRect(svg,x,y,width,height,id){
+	var stepEvent = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    stepEvent.setAttribute("x",x);
+    stepEvent.setAttribute("y",y);
+    stepEvent.setAttribute("width",width);
+    stepEvent.setAttribute("height",height);
+	stepEvent.setAttribute("style","fill:rgb(200, 224, 176);stroke-width:0;stroke:rgb(30, 0, 255)");
+    svg.appendChild(stepEvent);
+}
+
+function drawPriIntEnactRect(svg,x,y,width,height){
+	var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute("x",x);
+    rect.setAttribute("y",y);
+    rect.setAttribute("width",width);
+    rect.setAttribute("height",height);
+	rect.setAttribute("style","fill:none;stroke-width:2;stroke:rgb(255, 215, 0)");
+	svg.appendChild(rect);
+}
+
+
+function drawEventAreaStep(svg,x,y,width,height,id){
+	var stepEvent = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    stepEvent.setAttribute("x",x);
+    stepEvent.setAttribute("y",y);
+    stepEvent.setAttribute("width",width);
+    stepEvent.setAttribute("height",height);
+	stepEvent.setAttribute("style","fill:rgba(255,255,255,0.1);stroke-width:0;stroke:rgb(30, 0, 255)");
+
+	stepEvent.addEventListener("mouseover", function(event){reactStepEvent(event,id);}, false);//mouseover
+	stepEvent.addEventListener("mouseout", function(event){unreactStepEvent(event,id);}, false);//mouseout
+    svg.appendChild(stepEvent);
+}
+
+
+
+function reactEvent(event,id){//moveover
+	//alert(id+" react event");
+	//moveover显示composite interaction内容
+	var compositeId = "compositeGroup"+id;
+	var compositeInteractionSvgDiv = document.getElementById("compositeInteractionSvgDivId");//div
+	compositeInteractionSvgDiv.style.display = "block";
+	var compositeInteractionSvg = document.getElementById("compositeInteractionSvgId");//svg
+	compositeInteractionSvg.style.display = "block";
+	var compositeSvgGroup = document.getElementById(compositeId);//group
+	compositeSvgGroup.style.display = "block";
+
+	//moveover显示anticipation内容
+	/*var anticipationId = "step"+id;
+	var anticipationdiv = document.getElementById("anticipationdiv");//div
+	anticipationdiv.style.display = "block";
+	var anticipationSvg = document.getElementById("anticipationSvgId");//svg
+	anticipationSvg.style.display = "block";
+	var antigroup = document.getElementById(anticipationId);//group
+	antigroup.style.display = "block";*/
+}
+
+
+function reactStepEvent(event,id){//moveover
+	var intendedEnactedCompositeInteractionDiv = document.getElementById("intendedEnactedCompositeInteractionDiv");
+	intendedEnactedCompositeInteractionDiv.style.display = "block";
+	var divIntendedEnacted = document.getElementById("divIntendedEnacted"+id);
+	divIntendedEnacted.style.display = "block";
+	var enactedCompositeInteractionGroup = document.getElementById("enactedCompositeInteractionGroup"+id);//div
+	enactedCompositeInteractionGroup.style.display = "block";
+}
+
+function unreactStepEvent(event,id){//moveover
+	var intendedEnactedCompositeInteractionDiv = document.getElementById("intendedEnactedCompositeInteractionDiv");
+	intendedEnactedCompositeInteractionDiv.style.display = "none";
+	var divIntendedEnacted = document.getElementById("divIntendedEnacted"+id);
+	divIntendedEnacted.style.display = "none";
+	var enactedCompositeInteractionGroup = document.getElementById("enactedCompositeInteractionGroup"+id);//div
+	enactedCompositeInteractionGroup.style.display = "none";
+}
+
+function clickTheEvent(event,id){//click
+	
+	//总的anticipationDiv
+	var anticipationdiv = document.getElementById("anticipationdiv");//div
+	anticipationdiv.style.display = "block";
+	//单独step的anticipationDiv
+	var divAllAnticipation = document.getElementById("step"+id);//div
+	divAllAnticipation.style.display = "block";
+	//单独step的anticipation的defaultDiv
+	var divDefaultAnticipation = document.getElementById("step"+id+"divDefault");//div
+	divDefaultAnticipation.style.display = "block";
+	//单独step的anticipation的defaultDiv中的SVG
+	var defaultSVG = document.getElementById("step"+id+"default");//svg
+	defaultSVG.style.display = "block";
+	
+
+	var compositeId = "compositeGroup"+id;
+	var compositeInteractionSvgDiv = document.getElementById("compositeInteractionSvgDivId");//div
+	compositeInteractionSvgDiv.style.display = "none";
+	var compositeInteractionSvg = document.getElementById("compositeInteractionSvgId");//svg
+	compositeInteractionSvg.style.display = "none";
+	var compositeSvgGroup = document.getElementById(compositeId);//group
+	compositeSvgGroup.style.display = "none";
+
+}
+
+function showDetailAnticipations(id,detailActionId){
+	//alert(id+" "+detailActionId);
+	//var antidetailgroup = document.getElementById("step"+id+"detail"+detailActionId);//group
+	//antidetailgroup.style.display = "block";
+	
+	for(var detailActionIdIndex=1;detailActionIdIndex<7;detailActionIdIndex++){
+		//var antidetailgroup = document.getElementById("step"+id+"detail"+detailActionIdIndex);//group
+		//打开 divDetail
+		var divDetail = document.getElementById("step"+id+"divDetail"+detailActionId);
+		divDetail.style.display = "block";
+
+		var antidetailSVG = document.getElementById("step"+id+"detail"+detailActionIdIndex);//group
+		var actionDetailEventArea = document.getElementById("step"+id+"bigaction"+detailActionIdIndex);
+		
+		if(antidetailSVG){
+			if(detailActionIdIndex == detailActionId){
+				antidetailSVG.style.display = "block";
+				actionDetailEventArea.style.fill = "rgba(47, 231, 41, 0.527)";
+			}else{
+				antidetailSVG.style.display = "none";
+				actionDetailEventArea.style.fill = "rgba(255,255,255,0.1)";
+			}
+		}
+	}
+}
+
+function closeBigAnticipations(event,id){
+	//var anticipationId = "step"+id;
+	//alert(anticipationId);
+	/*var anticipationdiv = document.getElementById("anticipationdiv");//div
+	anticipationdiv.style.display = "none";
+	var anticipationSvg = document.getElementById("anticipationSvgId");//svg
+	anticipationSvg.style.display = "none";*/
+	
+	//先关闭细节框 div svg，然后关闭所有action的框
+	
+
+	for(var detailActionIdIndex=1;detailActionIdIndex<7;detailActionIdIndex++){
+		//detail div 消失
+		//关闭细节框和div
+		var antidetailSVG = document.getElementById("step"+id+"detail"+detailActionIdIndex);//细节框的groupID,使其消失
+		if(antidetailSVG){
+			var divDetail = document.getElementById("step"+id+"divDetail"+detailActionIdIndex);
+			divDetail.style.display = "none";
+			var actionDetailEventArea = document.getElementById("step"+id+"bigaction"+detailActionIdIndex);//复原action触发Event area框的样式
+			actionDetailEventArea.style.fill = "rgba(255,255,255,0.1)";
+			antidetailSVG.style.display = "none";
+		}
+	}
+ 
+	//关闭default svg  div ,default detail两者的大div框
+	var defaultSVG = document.getElementById("step"+id+"default");//default anticipation group
+	defaultSVG.style.display = "none";
+	var divDefaultAnticipation = document.getElementById("step"+id+"divDefault");//default anticipation group
+	divDefaultAnticipation.style.display = "none";
+	var divAllAnticipation = document.getElementById("step"+id);//default anticipation group
+	divAllAnticipation.style.display = "none";
+
+	//由于当前窗口还显示其他组的default anticipation的情况，所以不关闭anticipation div
+}
+
+function unreactEvent(event,id){//moveout
+	//alert(id+" unreat event");
+	var anticipationId = "step"+id;
+	var compositeId = "compositeGroup"+id;
+
+	/*
+	var anticipationdiv = document.getElementById("anticipationdiv");//div
+	anticipationdiv.style.display = "none";
+	var anticipationSvg = document.getElementById("anticipationSvgId");//svg
+	anticipationSvg.style.display = "none";
+	var antigroup = document.getElementById(anticipationId);//group
+	antigroup.style.display = "none";*/
+
+	var compositeInteractionSvgDiv = document.getElementById("compositeInteractionSvgDivId");//div
+	compositeInteractionSvgDiv.style.display = "none";
+	var compositeInteractionSvg = document.getElementById("compositeInteractionSvgId");//svg
+	compositeInteractionSvg.style.display = "none";
+	var compositeSvgGroup = document.getElementById(compositeId);//group
+	compositeSvgGroup.style.display = "none";
+
+}
+
+
+
+function drawSvgText(svg,words,x,y){
+	var text=document.createElementNS('http://www.w3.org/2000/svg','text');
+    text.setAttribute("x",x);
+    text.setAttribute("y",y);
+	text.setAttribute("style","font-size: 12px;font-weight: bold;");
+    text.textContent = words;
+    svg.appendChild(text);
+}
+
+var scalerate = 0.5;
+function drawNodes(svg,learnState,nodes,correspondX,correspondY,interactionLevel,drawMark){//表示是否要画drawMark，1要画，2不画
+	//这里需要注意如何更好的在canvas上画出不同层次的composite interaction
+	//alert(interactionLevel);
+	var scalecompute = scalerate**interactionLevel;
+	defaultmetre = defaultmetre*scalecompute;
+	/*if(interactionLevel>=2){
+		var scalecompute = scalerate**2;
+		defaultmetre = defaultmetre*scalecompute;
+	}else{
+		defaultmetre = defaultmetre*scalerate;
+	}*/
+	//var scalecompute = scalerate**interactionLevel;
+	//defaultmetre = defaultmetre*scalerate;
+
+	var levels = 0;
+	var mainNode = nodes[0];
+	var farleft = getFarLeft(mainNode,nodes);
+	var drawNodesStack = [];
+	var nodeforvisit = farleft;
+	var xindex = correspondX;
+	var yindex = correspondY;
+	while(!mainNode.isVisited){
+		var nodevisitString = nodeforvisit.infoString;
+		if(nodevisitString[0] == "<"){//得到一个复杂节点
+			var levels = 1;
+			var rectw = marginpadding*2+defaultmetre*2+imageBetweenMargin;//要画的小框的尺寸
+			var recth = marginpadding*2+defaultmetre;
+			//ctx.strokeRect(xindex-marginpadding,yindex-marginpadding,rectw,recth);
+			if(drawMark == 1)drawSvgRect(svg,learnState,xindex-marginpadding,yindex-marginpadding,rectw,recth);
+			//当前节点的位置尺寸参数信息
+			nodeforvisit.xindex = xindex-marginpadding;
+			nodeforvisit.yindex = yindex-marginpadding;
+			nodeforvisit.width = rectw;
+			nodeforvisit.height = recth;
+			nodeforvisit.level = levels;
+			//显示两个图片
+			var subNodevisitString = nodevisitString.substring(1,nodevisitString.length-1);
+			var subNodevisitString1 = subNodevisitString.substring(0,3);
+			var subNodevisitString2 = subNodevisitString.substring(3,6);
+			var img1 = document.getElementById(interactionImages[subNodevisitString1]);
+			var img2 = document.getElementById(interactionImages[subNodevisitString2]);
+			//ctx.drawImage(img1,xindex,yindex,defaultmetre,defaultmetre);
+			if(drawMark == 1)drawSvgImage(svg,xindex,yindex,defaultmetre,defaultmetre,img1.getAttribute("src"));
+			xindex = xindex+defaultmetre+imageBetweenMargin;
+			//ctx.drawImage(img2,xindex,yindex,defaultmetre,defaultmetre);
+			if(drawMark == 1)drawSvgImage(svg,xindex,yindex,defaultmetre,defaultmetre,img2.getAttribute("src"));
+			xindex = xindex+defaultmetre+marginpadding*2;
+			if(nodeforvisit.upperNodeDirection == "left"){//当前为复杂左侧节点，将节点存入栈中
+				//计算一下当前节点与下一个右侧节点之间的间距
+				var rightearestnode = rightNearest(nodeforvisit,nodes);
+				var rightearestnodeString = rightearestnode.infoString;
+				var rightNodeMargin = rightearestnode.layer-nodeforvisit.layer;
+				if(rightearestnodeString[0] != "<"){
+						rightNodeMargin--;//因为在<e11e11>的情形当中，e11到<还有一个间距需要加上
+				}
+				xindex = xindex+marginpadding*rightNodeMargin;//得出了下一个右侧节点的画的 x坐标
+				drawNodesStack.push(nodeforvisit);
+			}else{//右侧 复杂 节点
+				var rightUpperNode = nodeforvisit;
+				while(rightUpperNode.upperNodeDirection == "right"){//开始画框了, 因为是右边的节点，所以需要结合左边的节点形成一个整体,layer表示同样相邻的两个节点之间的间距计算，level用于计算框体高度
+					var correspondLeft = drawNodesStack.pop();//得到左边的节点，比较两个节点之间的级别
+					if(correspondLeft.level > rightUpperNode.level){
+						levels = correspondLeft.level+1;
+					}else{
+						levels = rightUpperNode.level+1;
+					}
+					var rectxindex = correspondLeft.xindex-marginpadding;//窗体的4个参数
+					var rectyindex = 0;
+					var rectwidth = correspondLeft.width+rightUpperNode.width+marginpadding*3;
+					var rectheight = 0;
+					if(correspondLeft.level > rightUpperNode.level){
+						rectyindex = correspondLeft.yindex-marginpadding;
+						rectheight = correspondLeft.height+marginpadding*2;
+					}else{
+						var levelDifference = levels-correspondLeft.level;
+						rectyindex = correspondLeft.yindex-(marginpadding*levelDifference);
+						rectheight = correspondLeft.height+marginpadding*2*levelDifference;
+					}
+					//ctx.strokeRect(rectxindex,rectyindex,rectwidth,rectheight);
+					if(drawMark == 1)drawSvgRect(svg,learnState,rectxindex,rectyindex,rectwidth,rectheight);
+					rightUpperNode = rightUpperNode.upperNode;
+					rightUpperNode.xindex = rectxindex;
+					rightUpperNode.yindex = rectyindex;
+					rightUpperNode.width = rectwidth;
+					rightUpperNode.height = rectheight;
+					rightUpperNode.level = levels;
+					if(rightUpperNode.upperNodeDirection == "left"){
+						drawNodesStack.push(rightUpperNode);
+					}
+					xindex=xindex+marginpadding;
+				}
+				if(!nodeforvisit.isLast){
+					var rightearestnode = rightNearest(nodeforvisit,nodes);
+					var rightearestnodeString = rightearestnode.infoString;
+					var rightNodeMargin = rightearestnode.layer-nodeforvisit.layer;
+					if(rightearestnodeString[0] != "<"){
+							rightNodeMargin--;//因为在<e11e11>的情形当中，e11到<还有一个间距需要加上
+					}
+					xindex = xindex+marginpadding*rightNodeMargin;//得出了下一个右侧节点的画的 x坐标
+				}
+			}
+		}else{//得到一个普通节点
+			var img = document.getElementById(interactionImages[nodevisitString]);
+			var levels = 0;
+			nodeforvisit.xindex = xindex;//当前简单节点的位置尺寸大小参数
+			nodeforvisit.yindex = yindex;
+			nodeforvisit.width = defaultmetre;
+			nodeforvisit.height = defaultmetre;
+			//ctx.drawImage(img,xindex,yindex,defaultmetre,defaultmetre);
+			if(drawMark == 1)drawSvgImage(svg,xindex,yindex,defaultmetre,defaultmetre,img.getAttribute("src"));
+			xindex=xindex+defaultmetre+marginpadding;
+			//由于画框与画图是分开的，所以两个坐标也是不同的，画框是通过前面的节点坐标和框的大小来的，画图是依据位移偏量来进行的
+			if(nodeforvisit.upperNodeDirection == "left"){//当前为左侧节点，将该节点存入栈中
+				//alert("这个结点是一个左方向的简单节点");
+				var rightearestnode = rightNearest(nodeforvisit,nodes);
+				var rightearestnodeString = rightearestnode.infoString;
+				var rightNodeMargin = rightearestnode.layer-nodeforvisit.layer;
+				if(rightearestnodeString[0] != "<"){
+						rightNodeMargin--;
+				}
+				xindex = xindex+marginpadding*rightNodeMargin;
+				drawNodesStack.push(nodeforvisit);
+			}else{//当前节点为右侧简单节点
+				var rightUpperNode = nodeforvisit;
+				while(rightUpperNode.upperNodeDirection == "right"){//这个只是为了画框吗？
+					var correspondLeft = drawNodesStack.pop();
+					if(correspondLeft.level > rightUpperNode.level){
+						levels = correspondLeft.level+1;
+					}else{
+						levels = rightUpperNode.level+1;
+					}
+					var rectxindex = correspondLeft.xindex-marginpadding;
+					var rectyindex = 0;
+					var rectwidth = correspondLeft.width+rightUpperNode.width+marginpadding*3;
+					var rectheight = 0;
+					if(correspondLeft.level > rightUpperNode){
+						rectyindex = correspondLeft.yindex-marginpadding;
+						rectheight = correspondLeft.height+marginpadding*2;
+					}else{
+						var levelDifference = levels-correspondLeft.level;
+						rectyindex = correspondLeft.yindex-(marginpadding*levelDifference);
+						rectheight = correspondLeft.height+marginpadding*2*levelDifference;
+
+					}
+					//ctx.strokeRect(rectxindex,rectyindex,rectwidth,rectheight);
+					if(drawMark == 1)drawSvgRect(svg,learnState,rectxindex,rectyindex,rectwidth,rectheight);
+					rightUpperNode = rightUpperNode.upperNode;
+					rightUpperNode.xindex = rectxindex;
+					rightUpperNode.yindex = rectyindex;
+					rightUpperNode.width = rectwidth;
+					rightUpperNode.height = rectheight;
+					rightUpperNode.level = levels;
+					if(rightUpperNode.upperNodeDirection == "left"){
+						drawNodesStack.push(rightUpperNode);
+					}
+					xindex=xindex+marginpadding//这里增加了一个单位，但是目前不知道这个是左什么用的;
+				}
+				if(!nodeforvisit.isLast){
+					var rightearestnode = rightNearest(nodeforvisit,nodes);
+					var rightearestnodeString = rightearestnode.infoString;
+					var rightNodeMargin = rightearestnode.layer-nodeforvisit.layer;
+					if(rightearestnodeString[0] != "<"){
+							rightNodeMargin--;//因为在<e11e11>的情形当中，e11到<还有一个间距需要加上
+					}
+					xindex = xindex+marginpadding*rightNodeMargin;//得出了下一个右侧节点的画的 x坐标
+				}
+			}
+		}
+		updateNodes(nodeforvisit,nodes);
+		nodeforvisit = rightNearest(nodeforvisit,nodes);
+	}
+	
+}
+
+function isHaveMark(infoString){
+	var isHaveMark = false;
+	for(var i=0;i<infoString.length;i++){
+		var charString = infoString[i];
+		if(charString == "<" || charString==">"){
+			isHaveMark = true;
+		}
+	}
+	return isHaveMark;
+}
+
+function  getFarLeft(mainNode,nodes){
+	//alert("the far left node");
+	var farleft = mainNode;
+	while(farleft.leftNode != null){
+		farleft = farleft.leftNode;
+	}
+	return farleft;
+}
+
+function rightNearest(currentNode,nodes){
+	var pointNode = currentNode;
+	var node = null;
+	while(pointNode.upperNodeDirection == "right"){
+		pointNode = pointNode.upperNode;
+	}
+	if(pointNode.upperNodeDirection != "top"){
+		pointNode = pointNode.upperNode.rightNode;
+		node = getFarLeft(pointNode,nodes);
+		return node;
+	}else{
+		node = null;
+		return node;
+	}
+}
+
+function  updateNodes(nodeforvisit,nodes){
+	nodeforvisit.isVisited = true;
+	var interNode = nodeforvisit;
+	if(interNode.upperNodeDirection == "right"){
+		while(interNode.upperNodeDirection == "right"){
+			interNode = interNode.upperNode;
+			interNode.isVisited = true;
+		}
+	}
+}
+
+function reset(){
+	//clearCurrent(xcenter,ycenter);
+	initialMaze();
+	window.location.reload();
+	alert("Reset process is done!");
+	//window.open('page.html');
+}
+
+
+//画曲线图，这里主要画 total valence
+var chart = null;
+$(document).ready(function() {
+  chart = Highcharts.chart('container', {
+    chart: {
+      type: 'spline',
+      events: {
+        load: drawCharts
+      }
+    },
+    title: {
+      text: 'Agent performance in interacting with the environment (steps - valences)'
+    },
+    xAxis: {
+    	title: {
+            text: 'Steps'
+        }
+    },
+    yAxis: {
+      minPadding: 0.2,
+      maxPadding: 0.2,
+      title: {
+        text: 'Total valences',
+        margin: 80
+      }
+    },
+    
+    legend:{
+    	layout: 'vertical',
+	      align: 'right',
+	      verticalAlign: 'middle',
+	      borderWidth: 0
+    },
+    series: [{
+      name: 'Constructivist cognitive architecture',
+      data: []
+    }]
+  });
+});
+
+//画曲线图，这里主要画 bumped times
+var chartBump = null;
+$(document).ready(function() {
+	chartBump = Highcharts.chart('bumpTimes', {
+    chart: {
+      type: 'spline',
+      events: {
+        load: drawCharts
+      }
+    },
+    title: {
+      text: 'Agent performance in interacting with the environment (steps - bumped times)'
+    },
+    xAxis: {
+    	title: {
+            text: 'Steps'
+        }
+    },
+    yAxis: {
+      minPadding: 0.2,
+      maxPadding: 0.2,
+      title: {
+        text: 'Bump times',
+        margin: 80
+      }
+    },
+    legend:{
+    	layout: 'vertical',
+	      align: 'right',
+	      verticalAlign: 'middle',
+	      borderWidth: 0
+    },
+    series: [{
+      name: 'Constructivist cognitive architecture',
+      data: []
+    }]
+  });
+});
+
+function drawCharts(){
+}
+
+function accelerate(){
+	var timegap = parseInt($("#time_interval").val());
+	if(timegap >= 200){
+		$("#time_interval").val(timegap-100);
+	}
+}
+
+function decelerate(){
+	var timegap = parseInt($("#time_interval").val());
+	if(timegap <= 2000){
+		$("#time_interval").val(timegap+100);
+	}
+
+}
+
+function exportResult(){
+	var reg=new RegExp("<br>","g");
+    var exportResult = document.getElementById("export");
+	
+    var content = exportResult.innerHTML.replace(reg,"\r\n");;
+    var data = new Blob([content],{type:"text/plain;charset=UTF-8"});
+    var downloadUrl = window.URL.createObjectURL(data);
+    var anchor = document.createElement("a");
+    anchor.href = downloadUrl;
+    anchor.download = "result_maze_optimize_svg-2_abstract.txt";
+    anchor.click();
+    window.URL.revokeObjectURL(data);
+}
+
+</script>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Developmental learning </title>
+<style type="text/css">
+.test {
+	text-align: center;
+}
+.canvas {
+	text-align: left;
+}
+.canvas p {
+	font-family: Arial, Helvetica, sans-serif;
+}
+.canvas table tr td {
+	font-family: Arial, Helvetica, sans-serif;
+	text-align: center;
+}
+.canvas table tr td table {
+	text-align: center;
+}
+.canvas table tr td table tr td {
+	text-align: center;
+}
+</style>
+</head>
+
+<body  onload="initialMaze();">
+
+<table width="1366" height="588" border="0" class="canvas">
+<tr>
+    <td width="582" height="537" align="center" valign="middle">
+
+		<canvas id="myCanvas" width="500" height="500" ></canvas>
+
+	</td>
+    <td width="464"><table width="484" height="232" border="1" cellspacing="0">
+      <td height="39" colspan="3">Parameters</td>
+      <tr>
+        <td height="39">move forward:</td>
+        <td><input type="number" id="v_move_forward"  name="v_move_forward" value="5" style="width:100px;"></td>
+		<td><img src="images/move_forward_original.png" id="move_forward" width="33" height="33" />
+        	<img src="images/move_forward_up.png" id="move_forward_up" width="33" height="33" style="visibility:hidden;"/>
+        </td>
+		
+      </tr>
+      <tr>
+        <td height="39">bump: </td>
+        <td><input type="number" id="v_bump"  name="v_bump" value="-10" style="width:100px;"></td>
+		<td><img src="images/bump_original.png" id="bump" width="33" height="33" />
+			<img src="images/bump_up.png" id="bump_up" width="33" height="33"  style="visibility:hidden;"/>
+        </td>
+		
+      </tr>
+      <tr>
+        <td height="39">turn:</td>
+        <td><input type="number" id="v_turn"  name="v_turn" value="-3" style="width:100px;"></td>
+        <td><img src="images/turn_left.png"  id="turn_left"  width="33" height="33" />&nbsp;&nbsp;
+        <img src="images/turn_right.png"   id="turn_right" width="33" height="33" /></td>
+      </tr>
+      <tr>
+        <td height="39">feel empty:</td>
+        <td><input type="number" id="v_feel_empty"  name="v_feel_empty" value="-1" style="width:100px;"></td>
+        <td><img src="images/feel_front_empty.png" id="feel_front_empty" width="33" height="33" />&nbsp;&nbsp;
+        <img src="images/feel_left_empty.png"  id="feel_left_empty" width="33" height="33" />&nbsp;&nbsp;
+        <img src="images/feel_right_empty.png"   id="feel_right_empty"  width="33" height="33" /></td>
+      </tr>
+      <tr>
+        <td width="178" height="39">feel the wall:</td>
+        <td><input type="number" id="v_feel_wall" name="v_feel_wall" value="-2" style="width:100px;"/></td>
+        <td><img src="images/feel_front_wall.png" id="feel_front_wall" width="33" height="33" />&nbsp;&nbsp;
+        <img src="images/feel_left_wall.png" id="feel_left_wall" width="33" height="33" />&nbsp;&nbsp;
+        <img src="images/feel_right_wall.png" id="feel_right_wall" width="33" height="33" /></td>
+      </tr>
+      <tr>
+        <td width="178" height="39">time interval:</td>
+        <td><input type="number" id="time_interval" name="time_interval" value="500" style="width:70px;"/>ms</td>
+		<td><input type="button" value="Speed up" onclick="accelerate();">
+			<input type="button" value="Slow down" onclick="decelerate();"></td>
+      </tr>
+      <tr>
+        <td width="178" height="39">actionType:</td>
+        <td ><input type="text" id="actionType" name="actionType" value=""  style="width:100px;"/></td>
+        <td rowspan="3" align="center"><input id="bumpTimesShowNumber" type="text" style="border: none; text-align:center; vertical-align:middel;width: 150px; height: 100px; font-size: 50px;" value="0" ></td>
+      </tr>
+      <tr>
+        <td width="178" height="39">Total Valence:</td>
+        <td><input type="number" id="totalValence" name="totalValence" value="0" style="width:100px;"/></td>
+      </tr>
+      <tr>
+        <td width="178" height="39">loop num:</td>
+        <td><input type="number" id="loopNum" name="loopNum" value="0" style="width:100px;"/></td>
+      </tr>
+      <tr>
+        <td height="39" colspan="3">
+        	<button type="button" onclick="start()">Start</button>&nbsp;&nbsp;
+        	<button type="button" onclick="stop()">Stop</button>&nbsp;&nbsp;
+        	<button type="button" onclick="reset()">Reset</button>
+        </td>
+      </tr>
+    </table></td>
+    <!-- <td width="200" height="537" align="center" valign="middle"><canvas id="canvas1" width="200" height="500" ></canvas></td> -->
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<table width="1340" height="1020" border="1" cellpadding="0" cellspacing="0" >
+  <tr>
+    <td width="1290">
+	    <div class="outdivclass">
+			<div class="leftdiv">
+				<div class="textComposite">Composite Interaction</div>
+				<div class="intendedEnacted">
+					<p>Intended Interaction</p>
+					<p>Enacted Interaction</p>
+				</div>	
+				<div class="stepValence">
+					<p>Interaction Step Number</p>
+					<p>Valence</p>
+				</div>
+			</div>
+			
+			<!-- 主要在这里动态交互内容 -->
+			<div id="scrolldiv" class="scrolldivclass">
+				<!--主要的完成 intendedInteraction, enactedInteraction,及其感应区，loopNum, valence的基础内容绘制-->
+				 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width = "1000" height = "1000" id="svgid"></svg>
+				 
+				 <!--主要的完成 compositeInteraction 内容的绘制-->
+				 <div class="compositeInteractionSvgDivClass" id="compositeInteractionSvgDivId"> <!--显示 composite interaction 的svg  -->
+					<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width = "1000" height = "1000" id="compositeInteractionSvgId" style="display:none;" ></svg>
+				</div>
+
+				<!--主要的完成 anticipation内容的绘制 内容的绘制      -->
+				 <div class="anticipationDivclass" id="anticipationdiv"> <!--显示anticipation的svg-->
+						<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width = "1000" height = "1000" id="anticipationSvgId" style="display:none;" ></svg>
+				</div>
+
+				
+				<!--主要完成 intended composite interaction 与  enacted composite  interaction的绘制 -->
+				<div class="intendedEnactedCompositeInteraction "" id="intendedEnactedCompositeInteractionDiv"> <!--显示anticipation的svg-->
+					<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width = "1000" height = "1000" id="intendedEnactedCompositeInteractionSVG" style="display:none;" ></svg>
+				</div>
+
+				
+
+
+
+				<!-- 用于计算 窗口大小，并不在上面画出内容   -->
+				<div class="temporaryDivClass" id="temporaryDivId"> <!--显示 composite interaction 的svg  -->
+					<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width = "1000" height = "1000" id="temporarySvgId" style="display:none;" ></svg>
+				</div>
+
+				<!--<canvas id="canvas1" width="2000" height="1000"></canvas>-->
+			</div>
+			
+		</div>
+	</td>
+	
+        
+  </tr>
+  <tr>
+	  <td align="center"><button type="button" onclick="start()" class="buttonClassStart">Start</button>
+	        <button type="button" onclick="stop()" class="buttonClassStop">Stop</button>
+			<button type="button" onclick="reset()" class="buttonClassReset">Reset</button>
+			<div id="showpixels" style="display: none;">显示隐藏的信息</div>
+			
+			<div id="showpixels" style="display: none;">
+				<img src="images/actions/move_forward_action.png"   id="move_forward_action"  width="33" height="33" />
+				<img src="images/actions/turn_left_action.png"   id="turn_left_action"  width="33" height="33" />
+				<img src="images/actions/turn_right_action.png"   id="turn_right_action"  width="33" height="33" />
+				<img src="images/actions/feel_front_action.png"   id="feel_front_action"  width="33" height="33" />
+				<img src="images/actions/feel_left_action.png"   id="feel_left_action"  width="33" height="33" />
+				<img src="images/actions/feel_right_action.png"   id="feel_right_action"  width="33" height="33" />
+				<img src="images/close.png"   id="close"  width="33" height="33" />
+				<img src="images/describe.png"   id="describe"  width="33" height="33" />
+				<img src="images/over.png"   id="over"  width="33" height="33" />
+				<img src="images/below.png"   id="below"  width="33" height="33" />
+				
+			</div>
+	 </td>
+  </tr>
+</table>
+
+
+
+
+    
+
+
+<!-- 
+<div class="outdivclass">
+    <div id="scrolldiv" class="scrolldivclass">
+            <canvas id="myCanvas" width="100" height="100" ></canvas>
+    </div>
+</div>
+ -->
+
+
+
+<p>&nbsp;</p>
+
+<!--
+<table width="1290" height="500" border="1" cellpadding="0" cellspacing="0" >
+  <tr>
+    <td width="1290"><canvas id="canvas2" width="1290" height="500"></canvas></td>
+  </tr>
+</table>
+-->
+
+ <p>&nbsp;</p>
+ <table width="1290" height="500" border="1" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><div id="container" style="width: 1290; height: 400px; margin: 0 auto"></div></td>
+  </tr>
+</table>
+<p>&nbsp;</p>
+ <table width="1290" height="500" border="1" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><div id="bumpTimes" style="width: 1290; height: 400px; margin: 0 auto"></div></td>
+  </tr>
+</table>
+
+
+
+
+<p>
+<div class="exportResult" id="export">
+</div>
+<input type="button" value="export result" onclick="exportResult();"> &nbsp; &nbsp;
+<!-- 
+<table width="20%" align="center" >
+<img src="images/logo_liris.png" width="10%" /> &nbsp;&nbsp;&nbsp;&nbsp;<img src="images/SMA.jpg" width="10%"/>
+</table>
+ -->
+
+<!-- 
+<div id="myDiv"><h2>Using the methods submit the interactions</h2></div>
+<button type="button" onclick="loadXMLDoc()">Edit the content</button>
+<p class="test">adfdasfdffad</p>
+https://www.youtube.com/watch?v=LVZ0cPpmSu8
+
+point1. color could be used to identify this learning process.
+ -->
+</body>
+</html>

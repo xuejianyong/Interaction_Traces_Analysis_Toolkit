@@ -1,0 +1,71 @@
+-------------------------- The beginning of the interaction -----------------------------------------------
+loop number is:1
+The first interaction and the all values initialization process.......
+parameters are{v_moveSucess:5 v_moveFailture:-10 v_turn:-3 v_feelEmpty:-1 v_feelWall:-2
+{
+e5=( label:e5 action:5), 
+e0=( label:e0 action:0), 
+e1=( label:e1 action:1), 
+e2=( label:e2 action:2), 
+e3=( label:e3 action:3), 
+e4=( label:e4 action:4)}
+
+{
+e40=e40_-2_0_0, 
+e51=e51_-1_0_0, 
+e50=e50_-2_0_0, 
+e31=e31_-1_0_0, 
+e30=e30_-2_0_0, 
+e41=e41_-1_0_0, 
+e00=e00_-10_0_0, 
+e11=e11_-3_0_0, 
+e21=e21_-3_0_0, 
+e01=e01_5_0_0
+}
+The first interaction...
+
+the sorted anticipations are:
+e50_0|e01_0|e11_0|e21_0|e30_0|e40_0|
+intendedInteraction is: e50_-2_0_0
+enactedInteraction is: e50_-2_0_0
+learnCompositeInteraction()
+
+--------------------------------------------------------------------------------------------------------
+
+the size of env is:10 10
+**********
+**--**--**
+*-*--*---*
+*-**-*-*-*
+*----*-*-*
+******-*-*
+*------*-*
+*--*****-*
+**-------*
+**********
+-------------------------- The beginning of the algorithm -----------------------------------------------
+loop number is:2
+
+the sorted anticipations are:
+e50_0|e01_0|e11_0|e21_0|e30_0|e40_0|
+intendedInteraction is: e50_-2_0_0
+enactedInteraction is: e50_-2_0_0
+learnCompositeInteraction()
+LEARN:<e50e50>_-4_1_1|
+The enacted interaction is: e50_-2_0_0
+
+--------------------------------------------------------------------------------------------------------
+
+the size of env is:10 10
+**********
+**--**--**
+*-*--*---*
+*-**-*-*-*
+*----*-*-*
+******-*-*
+*------*-*
+*--*****-*
+**-------*
+**********
+-------------------------- The beginning of the algorithm -----------------------------------------------
+loop number is:3

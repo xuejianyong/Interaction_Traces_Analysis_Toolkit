@@ -1,0 +1,1269 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   width="2225"
+   height="1000"
+   id="svgid"
+   sodipodi:docname="test.svg"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)">
+  <metadata
+     id="metadata2018">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs2016" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1366"
+     inkscape:window-height="706"
+     id="namedview2014"
+     showgrid="false"
+     inkscape:zoom="0.74387633"
+     inkscape:cx="1667.1762"
+     inkscape:cy="303.12563"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svgid" />
+  <rect
+     x="1158.5"
+     y="771"
+     width="60"
+     height="33"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1509" />
+  <image
+     x="1162.5"
+     y="775"
+     href="images/turn_right.png"
+     width="25"
+     height="25"
+     id="image1511" />
+  <image
+     x="1189.5"
+     y="775"
+     href="images/move_forward_original.png"
+     width="25"
+     height="25"
+     id="image1513" />
+  <image
+     x="1162.5"
+     y="700"
+     href="images/bump_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1515" />
+  <rect
+     x="1179"
+     y="696"
+     width="35"
+     height="20.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1517" />
+  <image
+     x="1183"
+     y="700"
+     href="images/turn_right.png"
+     width="12.5"
+     height="12.5"
+     id="image1519" />
+  <image
+     x="1197.5"
+     y="700"
+     href="images/move_forward_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1521" />
+  <rect
+     x="1158.5"
+     y="692"
+     width="59.5"
+     height="28.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1523" />
+  <rect
+     x="1158.5"
+     y="621"
+     width="35"
+     height="20.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1525" />
+  <image
+     x="1162.5"
+     y="625"
+     href="images/bump_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1527" />
+  <image
+     x="1177"
+     y="625"
+     href="images/turn_right.png"
+     width="12.5"
+     height="12.5"
+     id="image1529" />
+  <image
+     x="1197.5"
+     y="625"
+     href="images/move_forward_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1531" />
+  <rect
+     x="1154.5"
+     y="617"
+     width="59.5"
+     height="28.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1533" />
+  <image
+     x="1175"
+     y="850"
+     href="images/move_forward_original.png"
+     width="50"
+     height="50"
+     id="image1535" />
+  <image
+     x="1187.5"
+     y="862.5"
+     href="images/move_forward_original.png"
+     width="50"
+     height="50"
+     id="image1537" />
+  <rect
+     x="1175"
+     y="850"
+     width="62.5"
+     height="62.5"
+     style="fill:rgba(255,255,255,0.1);stroke-width:0;stroke:rgb(30, 0, 255)"
+     id="rect1539" />
+  <text
+     x="1200"
+     y="950"
+     style="font-size: 12px;font-weight: bold;"
+     id="text1541">16</text>
+  <text
+     x="1200"
+     y="975"
+     style="font-size: 12px;font-weight: bold;"
+     id="text1543">5</text>
+  <rect
+     x="1233.5"
+     y="771"
+     width="60"
+     height="33"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1545" />
+  <image
+     x="1237.5"
+     y="775"
+     href="images/move_forward_original.png"
+     width="25"
+     height="25"
+     id="image1547" />
+  <image
+     x="1264.5"
+     y="775"
+     href="images/turn_right.png"
+     width="25"
+     height="25"
+     id="image1549" />
+  <image
+     x="1237.5"
+     y="700"
+     href="images/turn_right.png"
+     width="12.5"
+     height="12.5"
+     id="image1551" />
+  <rect
+     x="1254"
+     y="696"
+     width="35"
+     height="20.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1553" />
+  <image
+     x="1258"
+     y="700"
+     href="images/move_forward_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1555" />
+  <image
+     x="1272.5"
+     y="700"
+     href="images/turn_right.png"
+     width="12.5"
+     height="12.5"
+     id="image1557" />
+  <rect
+     x="1233.5"
+     y="692"
+     width="59.5"
+     height="28.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1559" />
+  <rect
+     x="1233.5"
+     y="621"
+     width="35"
+     height="20.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1561" />
+  <image
+     x="1237.5"
+     y="625"
+     href="images/turn_right.png"
+     width="12.5"
+     height="12.5"
+     id="image1563" />
+  <image
+     x="1252"
+     y="625"
+     href="images/move_forward_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1565" />
+  <image
+     x="1272.5"
+     y="625"
+     href="images/turn_right.png"
+     width="12.5"
+     height="12.5"
+     id="image1567" />
+  <rect
+     x="1229.5"
+     y="617"
+     width="59.5"
+     height="28.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1569" />
+  <image
+     x="1250"
+     y="850"
+     href="images/turn_right.png"
+     width="50"
+     height="50"
+     id="image1571" />
+  <image
+     x="1262.5"
+     y="862.5"
+     href="images/turn_right.png"
+     width="50"
+     height="50"
+     id="image1573" />
+  <rect
+     x="1250"
+     y="850"
+     width="62.5"
+     height="62.5"
+     style="fill:rgba(255,255,255,0.1);stroke-width:0;stroke:rgb(30, 0, 255)"
+     id="rect1575" />
+  <text
+     x="1275"
+     y="950"
+     style="font-size: 12px;font-weight: bold;"
+     id="text1577">17</text>
+  <text
+     x="1275"
+     y="975"
+     style="font-size: 12px;font-weight: bold;"
+     id="text1579">-3</text>
+  <rect
+     x="1308.5"
+     y="771"
+     width="60"
+     height="33"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1581" />
+  <image
+     x="1312.5"
+     y="775"
+     href="images/turn_right.png"
+     width="25"
+     height="25"
+     id="image1583" />
+  <image
+     x="1339.5"
+     y="775"
+     href="images/bump_original.png"
+     width="25"
+     height="25"
+     id="image1585" />
+  <image
+     x="1312.5"
+     y="700"
+     href="images/move_forward_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1587" />
+  <rect
+     x="1329"
+     y="696"
+     width="35"
+     height="20.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1589" />
+  <image
+     x="1333"
+     y="700"
+     href="images/turn_right.png"
+     width="12.5"
+     height="12.5"
+     id="image1591" />
+  <image
+     x="1347.5"
+     y="700"
+     href="images/bump_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1593" />
+  <rect
+     x="1308.5"
+     y="692"
+     width="59.5"
+     height="28.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1595" />
+  <rect
+     x="1308.5"
+     y="621"
+     width="35"
+     height="20.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1597" />
+  <image
+     x="1312.5"
+     y="625"
+     href="images/move_forward_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1599" />
+  <image
+     x="1327"
+     y="625"
+     href="images/turn_right.png"
+     width="12.5"
+     height="12.5"
+     id="image1601" />
+  <image
+     x="1347.5"
+     y="625"
+     href="images/bump_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1603" />
+  <rect
+     x="1304.5"
+     y="617"
+     width="59.5"
+     height="28.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1605" />
+  <image
+     x="1325"
+     y="850"
+     href="images/move_forward_original.png"
+     width="50"
+     height="50"
+     id="image1607" />
+  <image
+     x="1337.5"
+     y="862.5"
+     href="images/bump_original.png"
+     width="50"
+     height="50"
+     id="image1609" />
+  <rect
+     x="1325"
+     y="850"
+     width="62.5"
+     height="62.5"
+     style="fill:rgba(255,255,255,0.1);stroke-width:0;stroke:rgb(30, 0, 255)"
+     id="rect1611" />
+  <text
+     x="1350"
+     y="950"
+     style="font-size: 12px;font-weight: bold;"
+     id="text1613">18</text>
+  <text
+     x="1350"
+     y="975"
+     style="font-size: 12px;font-weight: bold;"
+     id="text1615">-10</text>
+  <rect
+     x="1383.5"
+     y="771"
+     width="60"
+     height="33"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1617" />
+  <image
+     x="1387.5"
+     y="775"
+     href="images/bump_original.png"
+     width="25"
+     height="25"
+     id="image1619" />
+  <image
+     x="1414.5"
+     y="775"
+     href="images/feel_front_wall.png"
+     width="25"
+     height="25"
+     id="image1621" />
+  <image
+     x="1387.5"
+     y="700"
+     href="images/turn_right.png"
+     width="12.5"
+     height="12.5"
+     id="image1623" />
+  <rect
+     x="1404"
+     y="696"
+     width="35"
+     height="20.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1625" />
+  <image
+     x="1408"
+     y="700"
+     href="images/bump_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1627" />
+  <image
+     x="1422.5"
+     y="700"
+     href="images/feel_front_wall.png"
+     width="12.5"
+     height="12.5"
+     id="image1629" />
+  <rect
+     x="1383.5"
+     y="692"
+     width="59.5"
+     height="28.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1631" />
+  <rect
+     x="1383.5"
+     y="621"
+     width="35"
+     height="20.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1633" />
+  <image
+     x="1387.5"
+     y="625"
+     href="images/turn_right.png"
+     width="12.5"
+     height="12.5"
+     id="image1635" />
+  <image
+     x="1402"
+     y="625"
+     href="images/bump_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1637" />
+  <image
+     x="1422.5"
+     y="625"
+     href="images/feel_front_wall.png"
+     width="12.5"
+     height="12.5"
+     id="image1639" />
+  <rect
+     x="1379.5"
+     y="617"
+     width="59.5"
+     height="28.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1641" />
+  <image
+     x="1400"
+     y="850"
+     href="images/feel_front_wall.png"
+     width="50"
+     height="50"
+     id="image1643" />
+  <image
+     x="1412.5"
+     y="862.5"
+     href="images/feel_front_wall.png"
+     width="50"
+     height="50"
+     id="image1645" />
+  <rect
+     x="1400"
+     y="850"
+     width="62.5"
+     height="62.5"
+     style="fill:rgba(255,255,255,0.1);stroke-width:0;stroke:rgb(30, 0, 255)"
+     id="rect1647" />
+  <text
+     x="1425"
+     y="950"
+     style="font-size: 12px;font-weight: bold;"
+     id="text1649">19</text>
+  <text
+     x="1425"
+     y="975"
+     style="font-size: 12px;font-weight: bold;"
+     id="text1651">-2</text>
+  <rect
+     x="1458.5"
+     y="771"
+     width="60"
+     height="33"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1653" />
+  <image
+     x="1462.5"
+     y="775"
+     href="images/feel_front_wall.png"
+     width="25"
+     height="25"
+     id="image1655" />
+  <image
+     x="1489.5"
+     y="775"
+     href="images/bump_original.png"
+     width="25"
+     height="25"
+     id="image1657" />
+  <image
+     x="1462.5"
+     y="700"
+     href="images/bump_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1659" />
+  <rect
+     x="1479"
+     y="696"
+     width="35"
+     height="20.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1661" />
+  <image
+     x="1483"
+     y="700"
+     href="images/feel_front_wall.png"
+     width="12.5"
+     height="12.5"
+     id="image1663" />
+  <image
+     x="1497.5"
+     y="700"
+     href="images/bump_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1665" />
+  <rect
+     x="1458.5"
+     y="692"
+     width="59.5"
+     height="28.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1667" />
+  <rect
+     x="1458.5"
+     y="621"
+     width="35"
+     height="20.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1669" />
+  <image
+     x="1462.5"
+     y="625"
+     href="images/bump_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1671" />
+  <image
+     x="1477"
+     y="625"
+     href="images/feel_front_wall.png"
+     width="12.5"
+     height="12.5"
+     id="image1673" />
+  <image
+     x="1497.5"
+     y="625"
+     href="images/bump_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1675" />
+  <rect
+     x="1454.5"
+     y="617"
+     width="59.5"
+     height="28.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1677" />
+  <image
+     x="1475"
+     y="850"
+     href="images/move_forward_original.png"
+     width="50"
+     height="50"
+     id="image1679" />
+  <image
+     x="1487.5"
+     y="862.5"
+     href="images/bump_original.png"
+     width="50"
+     height="50"
+     id="image1681" />
+  <rect
+     x="1475"
+     y="850"
+     width="62.5"
+     height="62.5"
+     style="fill:rgba(255,255,255,0.1);stroke-width:0;stroke:rgb(30, 0, 255)"
+     id="rect1683" />
+  <text
+     x="1500"
+     y="950"
+     style="font-size: 12px;font-weight: bold;"
+     id="text1685">20</text>
+  <text
+     x="1500"
+     y="975"
+     style="font-size: 12px;font-weight: bold;"
+     id="text1687">-10</text>
+  <rect
+     x="1533.5"
+     y="771"
+     width="60"
+     height="33"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1689" />
+  <image
+     x="1537.5"
+     y="775"
+     href="images/bump_original.png"
+     width="25"
+     height="25"
+     id="image1691" />
+  <image
+     x="1564.5"
+     y="775"
+     href="images/feel_left_empty.png"
+     width="25"
+     height="25"
+     id="image1693" />
+  <image
+     x="1537.5"
+     y="700"
+     href="images/feel_front_wall.png"
+     width="12.5"
+     height="12.5"
+     id="image1695" />
+  <rect
+     x="1554"
+     y="696"
+     width="35"
+     height="20.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1697" />
+  <image
+     x="1558"
+     y="700"
+     href="images/bump_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1699" />
+  <image
+     x="1572.5"
+     y="700"
+     href="images/feel_left_empty.png"
+     width="12.5"
+     height="12.5"
+     id="image1701" />
+  <rect
+     x="1533.5"
+     y="692"
+     width="59.5"
+     height="28.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1703" />
+  <rect
+     x="1533.5"
+     y="621"
+     width="35"
+     height="20.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1705" />
+  <image
+     x="1537.5"
+     y="625"
+     href="images/feel_front_wall.png"
+     width="12.5"
+     height="12.5"
+     id="image1707" />
+  <image
+     x="1552"
+     y="625"
+     href="images/bump_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1709" />
+  <image
+     x="1572.5"
+     y="625"
+     href="images/feel_left_empty.png"
+     width="12.5"
+     height="12.5"
+     id="image1711" />
+  <rect
+     x="1529.5"
+     y="617"
+     width="59.5"
+     height="28.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1713" />
+  <image
+     x="1550"
+     y="850"
+     href="images/feel_left_wall.png"
+     width="50"
+     height="50"
+     id="image1715" />
+  <image
+     x="1562.5"
+     y="862.5"
+     href="images/feel_left_empty.png"
+     width="50"
+     height="50"
+     id="image1717" />
+  <rect
+     x="1550"
+     y="850"
+     width="62.5"
+     height="62.5"
+     style="fill:rgba(255,255,255,0.1);stroke-width:0;stroke:rgb(30, 0, 255)"
+     id="rect1719" />
+  <text
+     x="1575"
+     y="950"
+     style="font-size: 12px;font-weight: bold;"
+     id="text1721">21</text>
+  <text
+     x="1575"
+     y="975"
+     style="font-size: 12px;font-weight: bold;"
+     id="text1723">-1</text>
+  <rect
+     x="1608.5"
+     y="771"
+     width="60"
+     height="33"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1725" />
+  <image
+     x="1612.5"
+     y="775"
+     href="images/feel_left_empty.png"
+     width="25"
+     height="25"
+     id="image1727" />
+  <image
+     x="1639.5"
+     y="775"
+     href="images/bump_original.png"
+     width="25"
+     height="25"
+     id="image1729" />
+  <image
+     x="1612.5"
+     y="700"
+     href="images/bump_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1731" />
+  <rect
+     x="1629"
+     y="696"
+     width="35"
+     height="20.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1733" />
+  <image
+     x="1633"
+     y="700"
+     href="images/feel_left_empty.png"
+     width="12.5"
+     height="12.5"
+     id="image1735" />
+  <image
+     x="1647.5"
+     y="700"
+     href="images/bump_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1737" />
+  <rect
+     x="1608.5"
+     y="692"
+     width="59.5"
+     height="28.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1739" />
+  <rect
+     x="1608.5"
+     y="621"
+     width="35"
+     height="20.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1741" />
+  <image
+     x="1612.5"
+     y="625"
+     href="images/bump_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1743" />
+  <image
+     x="1627"
+     y="625"
+     href="images/feel_left_empty.png"
+     width="12.5"
+     height="12.5"
+     id="image1745" />
+  <image
+     x="1647.5"
+     y="625"
+     href="images/bump_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1747" />
+  <rect
+     x="1604.5"
+     y="617"
+     width="59.5"
+     height="28.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1749" />
+  <image
+     x="1625"
+     y="850"
+     href="images/move_forward_original.png"
+     width="50"
+     height="50"
+     id="image1751" />
+  <image
+     x="1637.5"
+     y="862.5"
+     href="images/bump_original.png"
+     width="50"
+     height="50"
+     id="image1753" />
+  <rect
+     x="1625"
+     y="850"
+     width="62.5"
+     height="62.5"
+     style="fill:rgba(255,255,255,0.1);stroke-width:0;stroke:rgb(30, 0, 255)"
+     id="rect1755" />
+  <text
+     x="1650"
+     y="950"
+     style="font-size: 12px;font-weight: bold;"
+     id="text1757">22</text>
+  <text
+     x="1650"
+     y="975"
+     style="font-size: 12px;font-weight: bold;"
+     id="text1759">-10</text>
+  <rect
+     x="1683.5"
+     y="771"
+     width="60"
+     height="33"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 0, 255)"
+     id="rect1761" />
+  <image
+     x="1687.5"
+     y="775"
+     href="images/bump_original.png"
+     width="25"
+     height="25"
+     id="image1763" />
+  <image
+     x="1714.5"
+     y="775"
+     href="images/turn_left.png"
+     width="25"
+     height="25"
+     id="image1765" />
+  <image
+     x="1687.5"
+     y="700"
+     href="images/feel_left_empty.png"
+     width="12.5"
+     height="12.5"
+     id="image1767" />
+  <rect
+     x="1704"
+     y="696"
+     width="35"
+     height="20.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1769" />
+  <image
+     x="1708"
+     y="700"
+     href="images/bump_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1771" />
+  <image
+     x="1722.5"
+     y="700"
+     href="images/turn_left.png"
+     width="12.5"
+     height="12.5"
+     id="image1773" />
+  <rect
+     x="1683.5"
+     y="692"
+     width="59.5"
+     height="28.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1775" />
+  <rect
+     x="1683.5"
+     y="621"
+     width="35"
+     height="20.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1777" />
+  <image
+     x="1687.5"
+     y="625"
+     href="images/feel_left_empty.png"
+     width="12.5"
+     height="12.5"
+     id="image1779" />
+  <image
+     x="1702"
+     y="625"
+     href="images/bump_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1781" />
+  <image
+     x="1722.5"
+     y="625"
+     href="images/turn_left.png"
+     width="12.5"
+     height="12.5"
+     id="image1783" />
+  <rect
+     x="1679.5"
+     y="617"
+     width="59.5"
+     height="28.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1785" />
+  <image
+     x="1700"
+     y="850"
+     href="images/turn_left.png"
+     width="50"
+     height="50"
+     id="image1787" />
+  <image
+     x="1712.5"
+     y="862.5"
+     href="images/turn_left.png"
+     width="50"
+     height="50"
+     id="image1789" />
+  <rect
+     x="1700"
+     y="850"
+     width="62.5"
+     height="62.5"
+     style="fill:rgba(255,255,255,0.1);stroke-width:0;stroke:rgb(30, 0, 255)"
+     id="rect1791" />
+  <text
+     x="1725"
+     y="950"
+     style="font-size: 12px;font-weight: bold;"
+     id="text1793">23</text>
+  <text
+     x="1725"
+     y="975"
+     style="font-size: 12px;font-weight: bold;"
+     id="text1795">-3</text>
+  <rect
+     x="1758.5"
+     y="771"
+     width="60"
+     height="33"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 0, 255)"
+     id="rect1797" />
+  <image
+     x="1762.5"
+     y="775"
+     href="images/turn_left.png"
+     width="25"
+     height="25"
+     id="image1799" />
+  <image
+     x="1789.5"
+     y="775"
+     href="images/move_forward_original.png"
+     width="25"
+     height="25"
+     id="image1801" />
+  <image
+     x="1762.5"
+     y="700"
+     href="images/bump_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1803" />
+  <rect
+     x="1779"
+     y="696"
+     width="35"
+     height="20.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 0, 255)"
+     id="rect1805" />
+  <image
+     x="1783"
+     y="700"
+     href="images/turn_left.png"
+     width="12.5"
+     height="12.5"
+     id="image1807" />
+  <image
+     x="1797.5"
+     y="700"
+     href="images/move_forward_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1809" />
+  <rect
+     x="1758.5"
+     y="692"
+     width="59.5"
+     height="28.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 0, 255)"
+     id="rect1811" />
+  <rect
+     x="1758.5"
+     y="621"
+     width="35"
+     height="20.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 0, 255)"
+     id="rect1813" />
+  <image
+     x="1762.5"
+     y="625"
+     href="images/bump_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1815" />
+  <image
+     x="1777"
+     y="625"
+     href="images/turn_left.png"
+     width="12.5"
+     height="12.5"
+     id="image1817" />
+  <image
+     x="1797.5"
+     y="625"
+     href="images/move_forward_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1819" />
+  <rect
+     x="1754.5"
+     y="617"
+     width="59.5"
+     height="28.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 0, 255)"
+     id="rect1821" />
+  <image
+     x="1775"
+     y="850"
+     href="images/move_forward_original.png"
+     width="50"
+     height="50"
+     id="image1823" />
+  <image
+     x="1787.5"
+     y="862.5"
+     href="images/move_forward_original.png"
+     width="50"
+     height="50"
+     id="image1825" />
+  <rect
+     x="1775"
+     y="850"
+     width="62.5"
+     height="62.5"
+     style="fill:rgba(255,255,255,0.1);stroke-width:0;stroke:rgb(30, 0, 255)"
+     id="rect1827" />
+  <text
+     x="1800"
+     y="950"
+     style="font-size: 12px;font-weight: bold;"
+     id="text1829">24</text>
+  <text
+     x="1800"
+     y="975"
+     style="font-size: 12px;font-weight: bold;"
+     id="text1831">5</text>
+  <rect
+     x="1833.5"
+     y="771"
+     width="60"
+     height="33"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1833" />
+  <image
+     x="1837.5"
+     y="775"
+     href="images/move_forward_original.png"
+     width="25"
+     height="25"
+     id="image1835" />
+  <image
+     x="1864.5"
+     y="775"
+     href="images/feel_front_wall.png"
+     width="25"
+     height="25"
+     id="image1837" />
+  <image
+     x="1837.5"
+     y="700"
+     href="images/turn_left.png"
+     width="12.5"
+     height="12.5"
+     id="image1839" />
+  <rect
+     x="1854"
+     y="696"
+     width="35"
+     height="20.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1841" />
+  <image
+     x="1858"
+     y="700"
+     href="images/move_forward_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1843" />
+  <image
+     x="1872.5"
+     y="700"
+     href="images/feel_front_wall.png"
+     width="12.5"
+     height="12.5"
+     id="image1845" />
+  <rect
+     x="1833.5"
+     y="692"
+     width="59.5"
+     height="28.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1847" />
+  <rect
+     x="1833.5"
+     y="621"
+     width="35"
+     height="20.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1849" />
+  <image
+     x="1837.5"
+     y="625"
+     href="images/turn_left.png"
+     width="12.5"
+     height="12.5"
+     id="image1851" />
+  <image
+     x="1852"
+     y="625"
+     href="images/move_forward_original.png"
+     width="12.5"
+     height="12.5"
+     id="image1853" />
+  <image
+     x="1872.5"
+     y="625"
+     href="images/feel_front_wall.png"
+     width="12.5"
+     height="12.5"
+     id="image1855" />
+  <rect
+     x="1829.5"
+     y="617"
+     width="59.5"
+     height="28.5"
+     style="fill:none;stroke-width:1;stroke:rgb(30, 223, 62)"
+     id="rect1857" />
+  <image
+     x="1850"
+     y="850"
+     href="images/feel_front_wall.png"
+     width="50"
+     height="50"
+     id="image1859" />
+  <image
+     x="1862.5"
+     y="862.5"
+     href="images/feel_front_wall.png"
+     width="50"
+     height="50"
+     id="image1861" />
+  <rect
+     x="1850"
+     y="850"
+     width="62.5"
+     height="62.5"
+     style="fill:rgba(255,255,255,0.1);stroke-width:0;stroke:rgb(30, 0, 255)"
+     id="rect1863" />
+  <text
+     x="1875"
+     y="950"
+     style="font-size: 12px;font-weight: bold;"
+     id="text1865">25</text>
+  <text
+     x="1875"
+     y="975"
+     style="font-size: 12px;font-weight: bold;"
+     id="text1867">-2</text>
+</svg>

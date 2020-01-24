@@ -1,0 +1,32 @@
+package dl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class CandidateInteraction {
+	
+	public int weight;
+	public List<Interaction> candidateList = new ArrayList<Interaction>();
+	
+	
+	
+	
+	
+	public List<Interaction> getCandidateList() {
+		return candidateList;
+	}
+	public void setCandidateList(List<Interaction> candidateList) {
+		this.candidateList = candidateList;
+	}
+	
+	public int getWeight() {
+		return weight;
+	}
+	public void setWeight(int weight) {
+		this.weight = weight;
+	}
+
+	
+	
+	
+}

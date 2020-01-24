@@ -1,0 +1,517 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script src="myScript.js"></script>
+<script src="./js/jquery-3.3.1.js"></script>
+<script>
+var xcenter = 0;
+var ycenter = 0;
+var interval = 0;
+var rate = 10;
+
+var direction = "";
+var actionNext = "";
+var directionNext = "";
+var decisonResult = "";
+
+var innerDist = 0;
+var isBoundary = "";
+var goFoward = true;
+var isInitial = true;    //是否第一次初始状态，用来与后续的动作相区别。
+var isInitialState = "";
+var isFirstInteraction = "yes";
+var fromServlet = false;//是否已经获得了算法给出的结果，由于这个过程比较快，
+						//所有有两种方式，1， ajax采用同步方式执行，2，设定一个timer，在这个timer当中算法可以及时的给agent传递参数。
+var isRunning = false;
+
+var valenceBump = 0;
+var valenceMoveForward = 0;
+var valenceTurn = 0;
+var valence = 0;
+
+var actionString = "";
+var actionIndex = 0;
+
+
+document.onkeydown=function(event){
+	var e = event || window.event || arguments.callee.caller.arguments[0];
+	//alert(e.keyCode);
+	if(e && e.keyCode==37){//left
+		//alert($("#direction").val());
+		if(direction == "left"){ 
+			if(!isBoundary(xcenter,ycenter,interval,"left")){
+				clearCurrent(xcenter,ycenter,innerDist);
+				xcenter -= interval;
+				direction = "left";
+				goFoward = true;
+				arrowDraw(xcenter,ycenter,innerDist,direction);
+				drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			}else{
+				goFoward = false;
+				drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			}
+		}else{//if the direction is not the same, change the direction first.
+			direction = "left";
+			clearCurrent(xcenter,ycenter,innerDist);
+			arrowDraw(xcenter,ycenter,innerDist,direction);
+		}
+		
+	}if(e && e.keyCode==38){//up
+		//alert(xcenter+","+ycenter);
+		if(direction == "up"){
+			if(!isBoundary(xcenter,ycenter,interval,"up")){
+				clearCurrent(xcenter,ycenter,innerDist);
+				ycenter -= interval;
+				direction = "up";
+				goFoward = true;
+				arrowDraw(xcenter,ycenter,innerDist,direction);
+				drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			}else{
+				//alert("you arrived the boundary of the evironment");
+				goFoward = false;
+				drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			}
+		}else{//if the direction is not the same, change the direction first.
+			direction = "up";
+			clearCurrent(xcenter,ycenter,innerDist);
+			arrowDraw(xcenter,ycenter,innerDist,direction);
+		}
+		
+	}if(e && e.keyCode==39){//right
+		if(direction == "right"){
+			if(!isBoundary(xcenter,ycenter,interval,"right")){
+				clearCurrent(xcenter,ycenter,innerDist);
+				xcenter += interval;
+				direction = "right";
+				goFoward = true;
+				arrowDraw(xcenter,ycenter,innerDist,direction);
+				drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			}else{
+				//alert("you arrived the boundary of the evironment");
+				goFoward = false;
+				drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			}
+		}else{//if the direction is not the same, change the direction first.
+			direction = "right";
+			clearCurrent(xcenter,ycenter,innerDist);
+			arrowDraw(xcenter,ycenter,innerDist,direction);
+		}
+	}if(e && e.keyCode==40){//down
+		if(direction == "down"){
+			if(!isBoundary(xcenter,ycenter,interval,"down")){
+				clearCurrent(xcenter,ycenter,innerDist);
+				ycenter += interval;
+				direction = "down";
+				goFoward = true;
+				arrowDraw(xcenter,ycenter,innerDist,direction);
+				drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			}else{
+				//alert("you arrived the boundary of the evironment");
+				goFoward = false;
+				drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			}
+		}else{//if the direction is not the same, change the direction first.
+			direction = "down";
+			clearCurrent(xcenter,ycenter,innerDist);
+			arrowDraw(xcenter,ycenter,innerDist,direction);
+		}
+	}
+	document.getElementById("direction").value = direction;
+}; 
+
+
+
+//画前方的小方格.
+function drawForward(xcenter,ycenter,innerDist,direction,goFoward){
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	//alert("the next step coordinates are:"+xcenter+","+(ycenter-interval));
+	if(goFoward){
+		ctx.fillStyle = "#3F0";
+	}else{//there is a wall in the front
+		ctx.fillStyle = "#F00";
+	}
+	switch(direction){
+	case "left":
+		ctx.fillRect(xcenter-innerDist,ycenter-innerDist/2,innerDist/2,innerDist);break;
+	case "up":
+		ctx.fillRect(xcenter-innerDist/2,ycenter-innerDist,innerDist,innerDist/2);break;
+	case "right":
+		ctx.fillRect(xcenter+innerDist/2,ycenter-innerDist/2,innerDist/2,innerDist);break;
+	case "down":
+		ctx.fillRect(xcenter-innerDist/2,ycenter+innerDist/2,innerDist,innerDist/2);break;
+	}
+}
+
+//检查前方是否是墙
+function isBoundary(xcenter,ycenter,interval,direction){
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	var isBoundary = false;
+	var nextPosX = 0;
+	var nextPosY = 0;
+	
+	switch(direction){
+	case "left":
+		nextPosX = xcenter - interval;
+		nextPosY = ycenter;
+		break;
+	case "up":
+		nextPosX = xcenter;
+		nextPosY = ycenter - interval;
+		break;
+	case "right":
+		nextPosX = xcenter + interval;
+		nextPosY = ycenter;
+		break;
+	case "down":
+		nextPosX = xcenter;
+		nextPosY = ycenter + interval;
+		break;
+	}
+	
+	var colors = ctx.getImageData(nextPosX, nextPosY, 1, 1).data;
+	var red=colors[0];
+	var green=colors[1];
+	var blue=colors[2];
+	if(red==0 && green==255 && blue==153){
+		isBoundary = true;
+	}
+	return isBoundary;
+}
+
+
+//*******************************************************************************************************
+function initialMaze(){
+	var c=document.getElementById("myCanvas");
+	var width = parseInt(c.getAttribute("width"));
+	var height = parseInt(c.getAttribute("height"));
+	interval = width/rate;
+	var ctx=c.getContext("2d");
+	ctx.fillStyle = "#0F9";
+	ctx.fillRect(0,0,interval,height);//left |
+	ctx.fillRect(0,0,width,interval);// up -
+	ctx.fillRect(width-interval,0,width,height);//right |
+	ctx.fillRect(0,height-interval,width,height);//down -
+	ctx.fillRect(interval*3,interval*3,width-interval*6,height-interval*6);//center map
+	
+	innerDist = interval/2;
+	isInitialState = "yes";
+	var datas ={"isInitialState":isInitialState};
+	$.ajax({
+		url:'/maze/AjaxServlet',
+	    type:'GET',
+	    async : true,
+	    data:datas,
+	    dataType:'json',
+	    success:function(data,status){
+	    	xcenter = innerDist + data.coordiY*interval;
+	    	ycenter = innerDist + data.coordiX*interval;
+	    	direction = data.direction;
+	    	isInitialState = data.isInitialState;
+
+	    	$("#xcenter").val(xcenter);
+			$("#ycenter").val(ycenter);
+			$("#direction").val(direction);
+	    	arrowDraw(xcenter,ycenter,innerDist,direction);
+	        },
+	    error:function(){
+	    	alert('isInitial error');
+	    	}
+	});
+}
+
+function clearCurrent(xcenter,ycenter,innerDist){
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+ 	ctx.clearRect(xcenter-innerDist,ycenter-innerDist,interval,interval);
+}
+
+function arrowDraw(xcenter,ycenter,innerDist,direction){
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	ctx.fillStyle = "#30F";
+	ctx.beginPath();
+	switch(direction){
+	case "up":
+		ctx.moveTo(xcenter,ycenter-innerDist);
+		ctx.lineTo(xcenter-innerDist,ycenter+innerDist);
+		ctx.lineTo(xcenter, ycenter+innerDist/2);
+		ctx.lineTo(xcenter+innerDist, ycenter+innerDist);
+		break;
+	case "down":
+		ctx.moveTo(xcenter,ycenter+innerDist);
+		ctx.lineTo(xcenter-innerDist,ycenter-innerDist);
+		ctx.lineTo(xcenter,ycenter-innerDist/2);
+		ctx.lineTo(xcenter+innerDist,ycenter-innerDist);
+		break;
+	case "left":
+		ctx.moveTo(xcenter-innerDist,ycenter);
+		ctx.lineTo(xcenter+innerDist,ycenter-innerDist);
+		ctx.lineTo(xcenter+innerDist/2,ycenter);
+		ctx.lineTo(xcenter+innerDist,ycenter+innerDist);
+		break;
+	case "right":
+		ctx.moveTo(xcenter+innerDist,ycenter);
+		ctx.lineTo(xcenter-innerDist,ycenter-innerDist);
+		ctx.lineTo(xcenter-innerDist/2,ycenter);
+		ctx.lineTo(xcenter-innerDist,ycenter+innerDist);
+		break;
+	}
+	ctx.closePath();
+	ctx.fill();
+}
+
+
+function enactAction(actionNext){
+	switch(actionNext){
+	case "move_forward":
+		switch(direction){
+		case "left":
+			if(!isBoundary(xcenter,ycenter,interval,"left")){
+				clearCurrent(xcenter,ycenter,innerDist);
+				xcenter -= interval;
+				goFoward = true;
+				arrowDraw(xcenter,ycenter,innerDist,direction);
+				drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			}else{
+				goFoward = false;
+				drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			}break;
+		case "up":
+			if(!isBoundary(xcenter,ycenter,interval,"up")){
+				clearCurrent(xcenter,ycenter,innerDist);
+				ycenter -= interval;
+				goFoward = true;
+				arrowDraw(xcenter,ycenter,innerDist,direction);
+				drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			}else{
+				//alert("you arrived the boundary of the evironment");
+				goFoward = false;
+				drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			}break;
+		case "right":
+			if(!isBoundary(xcenter,ycenter,interval,"right")){
+				clearCurrent(xcenter,ycenter,innerDist);
+				xcenter += interval;
+				goFoward = true;
+				arrowDraw(xcenter,ycenter,innerDist,direction);
+				drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			}else{
+				//alert("you arrived the boundary of the evironment");
+				goFoward = false;
+				drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			}break;
+		case "down":
+			if(!isBoundary(xcenter,ycenter,interval,"down")){
+				clearCurrent(xcenter,ycenter,innerDist);
+				ycenter += interval;
+				goFoward = true;
+				arrowDraw(xcenter,ycenter,innerDist,direction);
+				drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			}else{
+				//alert("you arrived the boundary of the evironment");
+				goFoward = false;
+				drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			}break;
+		}break;
+	case "turn_left":
+		switch(direction){
+		case "left":direction = "down";break;
+		case "up":direction = "left";break;
+		case "right":direction = "up";break;
+		case "down":direction = "right";break;
+		}
+		clearCurrent(xcenter,ycenter,innerDist);
+		arrowDraw(xcenter,ycenter,innerDist,direction);
+		break;
+	case "turn_right":
+		switch(direction){
+		case "left":direction = "up";break;
+		case "up":direction = "right";break;
+		case "right":direction = "down";break;
+		case "down":direction = "left";break;
+		}
+		clearCurrent(xcenter,ycenter,innerDist);
+		arrowDraw(xcenter,ycenter,innerDist,direction);
+		break;
+	}
+}
+
+
+function actionToString(actionIndex){
+	switch(actionIndex){
+	case 0:actionString = "move forward";break;
+	case 1:actionString = "turn left";break;
+	case 2:actionString = "turn right";break;
+	}
+	return actionString;
+}
+
+function start(){
+	var datas ={
+		"isInitialState":isInitialState,
+		"direction":direction,
+		"isFirstInteraction":isFirstInteraction,
+		"valenceBump":$("#valenceBump").val(),
+		"valenceMoveForward":$("#valenceMoveForward").val(),
+		"valenceTurn":$("#valenceTurn").val()
+		
+	};
+	$.ajax({
+		url:'/maze/AjaxServlet',
+	    type:'GET',
+	    async : true,
+	    data:datas,
+	    dataType:'json',
+	    success:function(data,status){
+	    	xcenter = innerDist + data.coordiY*interval;
+	    	ycenter = innerDist + data.coordiX*interval;
+	    	direction = data.direction;
+	    	isFirstInteraction = data.isFirstInteraction;
+	    	isBoundary = data.isBoundary;
+	    	valence = data.valence;
+	    	actionIndex = data.actionIndex;
+	    	
+	    	var preXcenter = innerDist + data.preCoordiY*interval;
+	    	var preYcenter = innerDist + data.preCoordiX*interval;
+	    	
+	    	$("#xcenter").val(xcenter);
+			$("#ycenter").val(ycenter);
+			$("#direction").val(direction);
+			$("#valence").val(valence);
+			$("#isBump").val(isBoundary);
+			$("#actionIndex").val(actionToString(actionIndex));
+			
+	    	
+	    	if(isBoundary == "yes"){
+	    		goFoward = false;
+	    	}else{
+	    		goFoward = true;
+	    	}
+	    	
+	    	clearCurrent(preXcenter,preYcenter,innerDist);
+	    	arrowDraw(xcenter,ycenter,innerDist,direction);
+			drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			
+			setTimeout('start()',1000);
+			
+	        },
+	    error:function(){
+	    	alert('start error');
+	    	}
+	});
+}
+
+function stop(){
+	alert("stop function");
+}
+
+
+
+
+
+</script>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Hierarchical sequential learning with intrinsic motivation </title>
+<style type="text/css">
+.test {
+	text-align: center;
+}
+.canvas {
+	text-align: center;
+}
+.canvas p {
+	font-family: Arial, Helvetica, sans-serif;
+}
+.canvas table tr td {
+	font-family: Arial, Helvetica, sans-serif;
+	text-align: center;
+}
+.canvas table tr td table {
+	text-align: center;
+}
+.canvas table tr td table tr td {
+	text-align: center;
+}
+</style>
+</head>
+
+<body class="canvas" onload="initialMaze();">
+
+<table width="1062" height="766" border="0">
+<tr>
+  <td colspan="2">Hierarchical sequential learning with intrinsic motivation</td></tr>
+  <tr>
+    <td width="582" height="589" align="center" valign="middle"><canvas id="myCanvas" width="500" height="500" ></canvas></td>
+    <td width="464"><table width="406" height="232" border="1" cellspacing="0">
+      <td height="39" colspan="2">Parameters</td>
+      <tr>
+        <td height="39">current position coordinate X: </td>
+        <td><input type="xcenter" id="xcenter"  name="xcenter" value="0"></td>
+      </tr>
+      <tr>
+        <td height="39">current position coordinate Y: </td>
+        <td><input type="ycenter" id="ycenter"  name="ycenter" value="0"></td>
+      </tr>
+      <tr>
+        <td height="39">current direction:</td>
+        <td><input type="text" id="direction"  name="direction" value=""></td>
+      </tr>
+      <tr>
+        <td height="39">action:</td>
+        <td><input type="text" id="actionIndex"  name="actionIndex" value=move_forward></td>
+      </tr>
+      <tr>
+        <td width="178" height="39">Is bumped:</td>
+        <td width="218"><input type="text" id="isBump" name="isBump" value="ture" /></td>
+      </tr>
+      <tr>
+        <td width="178" height="39">current valence:</td>
+        <td width="218"><input type="text" id="valence" name="valence" value="0" /></td>
+      </tr>
+      <tr>
+        <td width="178" height="39">valence bump:</td>
+        <td width="218"><input type="text" id="valenceBump" name="valenceBump" value="10" /></td>
+      </tr>
+      <tr>
+        <td width="178" height="39">valence move forward :</td>
+        <td width="218"><input type="text" id="valenceMoveForward" name="valenceMoveForward" value="10" /></td>
+      </tr>
+      <tr>
+        <td width="178" height="39">valence turn:</td>
+        <td width="218"><input type="text" id="valenceTurn" name="valenceTurn" value="0" /></td>
+      </tr>
+      
+      
+      <tr>
+        <td height="39">&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td height="39" colspan="2">&nbsp;</td>
+        </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td height="106" colspan="2"><p>Experiment 1. An agent-environment interactive environment for interacting.</p>
+    <p>with lazy learning for knowledge transfer</p>
+    <p><button type="button" onclick="start()">Start</button> <button type="button" onclick="stop()">Stop</button></p>
+    </td>
+  </tr>
+</table>
+
+
+<!-- 
+
+
+<div id="myDiv"><h2>Using the methods submit the interactions</h2></div>
+<button type="button" onclick="loadXMLDoc()">Edit the content</button>
+<p class="test">adfdasfdffad</p>
+https://www.youtube.com/watch?v=LVZ0cPpmSu8
+
+point1. color could be used to identify this learning process.
+ -->
+</body>
+</html>

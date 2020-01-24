@@ -1,0 +1,24 @@
+-------------------------- The beginning of the interaction -----------------------------------------------
+loop number is:1
+The first interaction and the all values initialization process.......
+parameters are{v_moveSucess:5 v_moveFailture:-10 v_turn:-3 v_feelEmpty:-1 v_feelWall:-2
+The first interaction...
+
+the sorted anticipations are:
+e01_0|e11_0|e21_0|e30_0|e40_0|e50_0|
+intendedInteraction is: e01_5_0_0
+enactedInteraction is: e00_-10_0_0
+learnCompositeInteraction()
+
+--------------------------------------------------------------------------------------------------------
+
+-------------------------- The beginning of the algorithm -----------------------------------------------
+loop number is:2
+
+the sorted anticipations are:
+e01_0|e11_0|e21_0|e30_0|e40_0|e50_0|
+intendedInteraction is: e01_5_0_0
+enactedInteraction is: e00_-10_0_0
+learnCompositeInteraction()
+LEARN:<e00e00>_-20_1_1|
+The enacted interaction is: e00_-10_0_0

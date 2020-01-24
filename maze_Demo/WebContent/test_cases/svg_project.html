@@ -1,0 +1,276 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>svg_project</title>
+<style>
+.outclass{
+    padding: 0px;
+    border: 1px solid rgb(73, 243, 21);
+    width: 1000px;
+    height: 600px;
+}
+
+.leftdiv{
+    background-color: blue;
+    height: 400px;
+    width: 100px;
+    float: left;
+}
+
+.divclass{
+    background-color: rgb(73, 243, 21);
+    width: 800px;
+    height: 560px;
+    overflow:auto;
+    position: relative;
+}
+
+.svgclass{
+    background-color: rgb(233, 231, 128);
+}
+
+.testdivclass{
+    display: none;
+}
+
+div.anticipationclass{
+    background-color: rgb(204, 63, 157);;
+    display: none;
+    position: absolute;
+    left: 100px;
+    top: 100px;
+    width: 350px;
+    height: 250px;;
+}
+
+div.compositeclass{
+    background-color: rgb(158, 67, 67);;
+    display: block;
+    position: absolute;
+    left: 150px;
+    top: 150px;
+    width: 200px;
+    height: 200px;
+}
+
+
+</style>
+<script>
+var testheight = 300;
+function addicons(){
+    var svg = document.getElementById('svgid');
+
+    var rect=document.createElementNS('http://www.w3.org/2000/svg','rect'); 
+    rect.setAttribute("x","260");
+    rect.setAttribute("y","60");
+    rect.setAttribute("width","50");
+    rect.setAttribute("height","50");
+    rect.setAttribute("style","fill:none;stroke-width:2;stroke:rgb(0,0,0)");
+    svg.appendChild(rect);
+
+
+    var svgimg = document.createElementNS('http://www.w3.org/2000/svg','image');
+    svgimg.setAttributeNS(null,'height','200');
+    svgimg.setAttributeNS(null,'width','200');
+    svgimg.addEventListener("mouseover", function(event){reactEvent(event,"id");}, false);
+    svgimg.addEventListener("mouseout", unreactEvent, false);
+    svgimg.setAttributeNS('http://www.w3.org/1999/xlink','href', 'images/feel_right_empty.png');
+    svgimg.setAttributeNS(null,'x','50');
+    svgimg.setAttributeNS(null,'y','50');
+    svgimg.setAttributeNS(null, 'visibility', 'visible');
+    svg.appendChild(svgimg);
+
+    var rectup=document.createElementNS('http://www.w3.org/2000/svg','rect'); 
+    rectup.setAttribute("id","rectup");
+    rectup.setAttribute("x","100");
+    rectup.setAttribute("y","100");
+    rectup.setAttribute("width","100");
+    rectup.setAttribute("height","100");
+    rectup.setAttribute("style","fill:none;stroke-width:2;stroke:rgb(0,0,0);display:none;");
+    svg.appendChild(rectup);
+
+
+    var image1 = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+    image1.setAttribute("href","images/feel_right_empty.png");
+    image1.setAttribute("width","50");
+    image1.setAttribute("height","50");
+    
+    svg.appendChild(image1);
+    //alert(svg.innerHTML);
+
+    var text=document.createElementNS('http://www.w3.org/2000/svg','text'); 
+    text.setAttribute("x",300);
+    text.setAttribute("y",40);
+    text.textContent = "asdfadsff";
+    svg.appendChild(text);
+
+    //draw();
+
+    //testheight+=200;
+    //svg.setAttribute("height",testheight);
+    //alert(svg.getAttribute("height"));
+
+    
+
+
+}
+
+function AnticipationNode(proclivity){
+	this.interactions = [];
+	this.proclivity = proclivity;
+}
+
+function addiconsad(){
+
+    var anticipationNodes = [];
+    var anticipationsString = document.getElementById("information").value;//<e01e01>_10|e11_0|e21_0|e30_0|e40_0|e50_0|e01_-5|<e01e00>_-5|<<e01e00>e21>_-8|<e00e21>_-13|
+    var ancitipationStrings = anticipationsString.split("|");//<<e01e00>e21>_-8
+    var maxInteractionNum = 0;
+    for(var i=0;i<ancitipationStrings.length-1;i++){
+        var ancitipationString = ancitipationStrings[i];//<<e01e00>e21>或者e11
+        var anticipationSmalls = ancitipationString.split("_");
+        var antiInteraction = anticipationSmalls[0];
+        var proclivity = anticipationSmalls[1];
+        
+        var antiNode = new AnticipationNode(proclivity);
+
+
+        if(antiInteraction[0] != "<"){
+            antiNode.interactions.push(antiInteraction+"e");
+            if(maxInteractionNum<1)maxInteractionNum = 1;
+        }else{
+            var listEIndexs = [];
+            for(var j=0;j<antiInteraction.length;j++){
+                var antichar = antiInteraction[j];
+                if(antichar == "e"){
+                    listEIndexs.push(j);
+                }
+            }
+            
+            if(maxInteractionNum<listEIndexs.length)maxInteractionNum = listEIndexs.length;
+            for(var k in listEIndexs){
+                var interactionPiece = antiInteraction.substring(listEIndexs[k],listEIndexs[k]+3);
+                antiNode.interactions.push(interactionPiece);
+            }
+            
+        }
+        anticipationNodes.push(antiNode);
+    }
+
+    
+    
+    var listbigString = "";
+    for(var antiNodeIndex in anticipationNodes){
+        antiNode = anticipationNodes[antiNodeIndex];
+        var antiInteractions = antiNode.interactions;
+        var listsmallstring = antiNode.proclivity;
+        for(var interactionPiece in antiInteractions){
+            listsmallstring = listsmallstring+" "+antiInteractions[interactionPiece];
+        }
+        listbigString = listbigString+"<p>"+listsmallstring+"</p>";
+    }
+
+    var testdivid = document.getElementById("testdivid");
+    testdivid.innerHTML = listbigString;
+    testdivid.style.display = "block";
+
+
+    maxInteractionNum+=1;
+    var maxiheight = 30*(ancitipationStrings.length-1);
+    var maxiwidth = maxInteractionNum*30;
+
+    //计算一下显示框的大小
+    var anticipationdiv = document.getElementById("anticipationdiv");
+    //anticipationdiv.style.display = "block";
+    var svganticipation = document.getElementById('anticipations');
+    //svganticipation.setAttribute("width",200);
+    //svganticipation.setAttribute("height",300);
+    //svganticipation.setAttribute("style","fill:rgb(73, 221, 98)");
+
+    var rect1 = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect1.setAttribute("x",0);
+    rect1.setAttribute("y",0);
+    rect1.setAttribute("width",50);
+    rect1.setAttribute("height",50);
+    svganticipation.appendChild(rect1);
+   
+    var svgoriginal = document.getElementById('svgid');
+    var image1 = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+    image1.setAttribute("x",200);
+    image1.setAttribute("y",100);
+	image1.setAttribute("href","images/bump.png");
+    image1.setAttribute("width",50);
+    image1.setAttribute("height",50);
+    svgoriginal.appendChild(image1);
+    //alert(svg.innerHTML);
+}
+
+function reactEvent(event,id){
+    //alert(event.clientX);
+    //alert(id);
+    var svg = document.getElementById('rectup');
+    //var rect = svg.getBoundingClientRect();
+    //alert(rect.top+" "+rect.left+" "+rect.right+" "+rect.bottom);
+    var rectup = document.getElementById('rectup');
+    rectup.style.display = "block";
+    var testdiv = document.getElementById('testdivid');
+    testdiv.style.display = "block";
+}
+function unreactEvent(){
+    var testdiv = document.getElementById('testdivid');
+    testdiv.style.display = "none";
+    var rectup = document.getElementById('rectup');
+    rectup.style.display = "none";
+}
+    
+function draw() {  
+       var canvas = document.getElementById("cv");   
+       if (canvas.getContext) {   
+       var ctx = canvas.getContext("2d");  
+           // Quadratric curves example ctx.beginPath();   
+           ctx.moveTo(75,25);   
+           ctx.quadraticCurveTo(25,25,25,62.5);   
+           ctx.quadraticCurveTo(25,100,50,100);   
+           ctx.quadraticCurveTo(50,120,30,125);   
+           ctx.quadraticCurveTo(60,120,65,100);   
+           ctx.quadraticCurveTo(125,100,125,62.5);   
+           ctx.quadraticCurveTo(125,25,75,25);   
+           ctx.stroke();  
+       }    
+    }   
+</script>
+</head>
+
+<body>
+
+<div class="outclass">
+    <div class="leftdiv"></div>
+    <div id="divid" class="divclass">
+        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width = "600" height = "400" id="svgid" style="background-color: rgb(233, 231, 128);" ></svg>
+        <div id="anticipationdiv" class="anticipationclass">
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width = "300" height = "200" id="anticipations" 
+            style="display: block;" ></svg>
+        </div>
+        <div id="compositediv" class="compositeclass">
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width = "150" height = "150" id="composite" 
+            style="display: block;background-color: blueviolet;" >
+            <rect x="10" y="10" width="30" height="30" stroke="black"  stroke-width="5" fill="red"/>
+
+            </svg>
+        </div>
+    </div>
+    
+</div>
+    
+</div>
+
+<input type="text" id="information" value="<e01e01>_10|e11_0|e21_0|e30_0|e40_0|e50_0|e01_-5|<e01e00>_-5|<<e01e00>e21>_-8|<e00e21>_-13|" style="width:700px;">
+
+
+
+<input type="button" value="click the button" onclick="addiconsad();">
+<div id="testdivid" class="testdivclass"></div>
+<!--<canvas id="cv" width="500" height="500" />-->
+</body>
+</html>

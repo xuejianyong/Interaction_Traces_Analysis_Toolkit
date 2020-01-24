@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript">
+$.ajax({
+	url:'xxx',
+    type:'post',
+    dataType:'json',
+    data:{'email':email},
+    success:function(data,status){
+    	alert(data.value);
+        },
+    error:function(){
+    	alert('error');
+    	}
+}
+    
+    
+if(isInitial){
+xmlhttp.open("GET","/maze/AjaxServlet",true);
+}else{	
+}
+
+
+var parameters = "?direction="+direction;
+xmlhttp.open("GET","/maze/AjaxServlet"+parameters,true);
+xmlhttp.onreadystatechange=function(){
+if (xmlhttp.readyState==4 && xmlhttp.status==200){
+	actionNext = xmlhttp.responseText;
+	var enactSate = enactAction(actionNext);
+	document.getElementById("actionId").value = actionNext;
+	setTimeout('start()',1000);
+}
+}
+xmlhttp.send();
+
+
+
+var datas ={"direction":direction};
+$.ajax({
+	url:'/maze/AjaxServlet',
+    type:'GET',
+    async : true,
+    data:datas,
+    dataType:'json',
+    success:function(data,status){
+    	alert(data);
+    	alert(status);
+        },
+    error:function(){
+    	alert('error');
+    	}
+}
+
+
+function start(){
+	//alert("alert start function");
+	//alert($("#direction").val()); 
+	var xmlhttp;
+	if (window.XMLHttpRequest){//  IE7+, Firefox, Chrome, Opera, Safari browser code
+		xmlhttp=new XMLHttpRequest();
+	}else{// IE6, IE5 browsre code
+		xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	if(isInitial){
+		var parameters = "?direction="+direction+"&isInitial="+isInitial+"";
+	}else{
+		var parameters = "?direction="+direction;
+	}
+	
+	xmlhttp.open("GET","/maze/AjaxServlet"+parameters,true);
+	xmlhttp.onreadystatechange=function(){
+		if (xmlhttp.readyState==4 && xmlhttp.status==200){
+			decisonResult = xmlhttp.responseText;
+			actionNext = xmlhttp.responseText;
+			//alert(actionNext);
+			var enactSate = enactAction(actionNext);
+			document.getElementById("actionId").value = actionNext;
+			setTimeout('start()',1000);
+		}
+	}
+	xmlhttp.send();
+}
+
+
+
+
+/*
+$.each(data,function(key,value){
+	//alert("the data")
+	//alert(key +":"+ value);
+	});
+//alert(status);
+*/
+
+</script>
+
+
+
+</head>
+<body>
+
+
+
+else {
+			updatePosibility(isBound,cp);//update the posibilities with different directions
+			Position temp = new Position();
+			
+			//move forward.
+		}
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+package dl;
+
+public class Experience {
+	
+	public String label;
+	public int action;
+	public boolean isAbstract = true;
+	
+	
+	public boolean isAbstract() {
+		return isAbstract;
+	}
+
+	public void setAbstract(boolean isAbstract) {
+		this.isAbstract = isAbstract;
+	}
+	
+	public void resetAbstract(){
+		this.setAbstract(false);
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
+	public int getAction() {
+		return action;
+	}
+
+	public void setAction(int action) {
+		this.action = action;
+	}
+
+	public Experience(String label, int actionType) {
+		// TODO Auto-generated constructor stub
+		this.setLabel(label);
+		this.setAction(actionType);
+	}
+
+	@Override
+	public String toString() {
+		return "( label:"+this.label+" action:"+this.action+")";
+	}
+	
+}

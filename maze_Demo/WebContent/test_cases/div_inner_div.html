@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>div inner div</title>
+<style>
+
+.testdiv{
+    position:relative;
+    left: 100px;
+    height: 500px;
+    width: 500px;
+    background-color: aqua;
+    border: 1px solid rgb(73, 243, 21);
+}
+
+
+</style>
+<script>
+function loadfunction(){
+    //alert("load function");
+    testdiv = document.getElementById("testdiv");
+    //alert(testdiv.innerHTML);
+}
+
+function activateButton(){
+    testdiv = document.getElementById("testdiv");
+    creatediv = document.createElement("div");
+    creatediv.style = "height:100px;width:200px;background-color: green;position:absolute;";
+    creatediv.innerText = "the create div content";
+    testdiv.appendChild(creatediv);
+    alert(testdiv.innerHTML);
+    
+}
+
+
+function testjavascript(){
+    var svg = document.getElementById("svgid");
+    if(!document.getElementById("adffddf")){
+        alert("bucunca");
+    }
+    
+    var gup=document.createElementNS('http://www.w3.org/2000/svg','g'); //创建 svg group
+    gup.setAttribute("id","step-of-action");
+	gup.setAttribute("style","display:block");
+    svg.appendChild(gup);
+    
+    var indexid = 1;
+    //开始遍历这些action,每个action的矩形框为一个激活入口
+    for(var i=0;i<2;i++){
+        var detailEventRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        detailEventRect.setAttribute("id",indexid);
+        detailEventRect.setAttribute("x",10);
+        detailEventRect.setAttribute("y",i*50);
+        detailEventRect.setAttribute("width",60);
+        detailEventRect.setAttribute("height",30);
+        detailEventRect.setAttribute("style","fill:rgba(255,255,255,0.1);stroke-width:1;stroke:rgb(30, 0, 255)");
+        detailEventRect.setAttribute("onclick","showDetailAnticipations2("+indexid+","+indexid+")");
+        detailEventRect.addEventListener("mouseover", function(event){showDetailAnticipations(event,indexid);}, false);//click
+        gup.appendChild(detailEventRect);
+        
+        //用来显示
+        var detailgup=document.createElementNS('http://www.w3.org/2000/svg','g'); //创建 svg group
+        detailgup.setAttribute("id","step-detail-"+indexid);
+	    detailgup.setAttribute("style","display:block");
+        svg.appendChild(detailgup);
+
+        indexid++;
+   }
+   
+   console.log(svg);
+}
+
+function showDetailAnticipations(event,id){
+    var detailid = "step-detail-"+id;
+	alert(detailid);
+}
+
+function showDetailAnticipations2(id){
+    alert(id);
+
+}
+
+function checkproperty(){
+    var checkdiv = document.getElementById("testdiv");
+    checkdiv.style.borderWidth = "5px";
+    checkdiv.style.backgroundColor = "A88DF885";
+}
+</script>
+</head>
+
+<body>
+<div id="testdiv" class="testdiv">
+        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width = "600" height = "400" id="svgid" 
+        style="background-color: rgba(47, 231, 41, 0.603);" ></svg>
+</div>
+
+
+<input type="button" value="click this" onclick="activateButton();">
+<input type="button" value="test javascript" onclick="testjavascript();">
+<input type="button" value="checkproperty" onclick="checkproperty();">
+
+
+</body>
+</html>

@@ -1,0 +1,22 @@
+document.onkeydown=function(event){
+	var e = event || window.event || arguments.callee.caller.arguments[0];
+	//alert(e.keyCode);
+	if(e && e.keyCode==37){//left
+		alert();
+	}if(e && e.keyCode==38){//up
+		
+	}if(e && e.keyCode==39){//right
+		
+	}if(e && e.keyCode==40){//down
+		
+	}
+}; 
+
+
+
+
+/*
+		if(!(nextPosY>25)){
+			isBoundary = true;
+		}
+		*/

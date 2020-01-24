@@ -1,0 +1,884 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script src="myScript.js"></script>
+<script src="./js/jquery-3.3.1.js"></script>
+<script>
+var rate = 10;
+var width = 500;
+var height = 500;
+var interval = width/rate;
+var innerDist = interval/2;
+
+var xcenter = 0;
+var ycenter = 0;
+var direction = "";
+var isInitialState = "";
+var resultString = "";
+var isReady="";
+
+var startState = true;
+function drawEnvironment(){
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	ctx.fillStyle = "#0F9";
+	ctx.fillRect(0,0,interval,height);//left |
+	ctx.fillRect(0,0,width,interval);// up -
+	ctx.fillRect(width-interval,0,width,height);//right |
+	ctx.fillRect(0,height-interval,width,height);//down -
+	//ctx.fillRect(interval*2,interval*2,interval*2,interval*2);//center map
+	//ctx.fillRect(interval*3,interval*3,width-interval*6,height-interval*6);//center map
+	ctx.fillRect(interval*2,interval*2,interval*5,interval*1);
+	ctx.fillRect(interval*2,interval*3,interval*6,interval*4);
+	ctx.fillRect(interval*3,interval*7,interval*5,interval*1);
+	ctx.fillRect(interval*8,interval*1,interval*1,interval*1);
+	ctx.fillRect(interval*1,interval*8,interval*1,interval*1);
+	
+}
+
+function arrowDraw(xcenter,ycenter,innerDist,direction){
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	ctx.fillStyle = "#30F";
+	ctx.beginPath();
+	switch(direction){
+	case "up":
+		ctx.moveTo(xcenter,ycenter-innerDist);
+		ctx.lineTo(xcenter-innerDist,ycenter+innerDist);
+		ctx.lineTo(xcenter, ycenter+innerDist/2);
+		ctx.lineTo(xcenter+innerDist, ycenter+innerDist);
+		break;
+	case "down":
+		ctx.moveTo(xcenter,ycenter+innerDist);
+		ctx.lineTo(xcenter-innerDist,ycenter-innerDist);
+		ctx.lineTo(xcenter,ycenter-innerDist/2);
+		ctx.lineTo(xcenter+innerDist,ycenter-innerDist);
+		break;
+	case "left":
+		ctx.moveTo(xcenter-innerDist,ycenter);
+		ctx.lineTo(xcenter+innerDist,ycenter-innerDist);
+		ctx.lineTo(xcenter+innerDist/2,ycenter);
+		ctx.lineTo(xcenter+innerDist,ycenter+innerDist);
+		break;
+	case "right":
+		ctx.moveTo(xcenter+innerDist,ycenter);
+		ctx.lineTo(xcenter-innerDist,ycenter-innerDist);
+		ctx.lineTo(xcenter-innerDist/2,ycenter);
+		ctx.lineTo(xcenter-innerDist,ycenter+innerDist);
+		break;
+	}
+	ctx.closePath();
+	ctx.fill();
+}
+
+function enactAction(actionType){
+	var isBump = false;
+	var nextPosX = 0;
+	var nextPosY = 0;
+	
+	clearCurrent(xcenter,ycenter);
+	
+	switch(actionType){
+	case 0://move forward
+		switch(direction){
+		case "up":
+			nextPosX = xcenter;
+			nextPosY = ycenter - interval;break;
+		case "right":
+			nextPosX = xcenter + interval;
+			nextPosY = ycenter;break;
+		case "down":
+			nextPosX = xcenter;
+			nextPosY = ycenter + interval;break;
+		case "left":
+			nextPosX = xcenter - interval;
+			nextPosY = ycenter;break;
+		}
+		isBump = isBoundary(nextPosX,nextPosY);
+		if(!isBump){//no bump with the wall
+			xcenter = nextPosX;
+			ycenter = nextPosY;
+			arrowDraw(xcenter,ycenter,innerDist,direction);
+			drawForward(xcenter,ycenter,isBump,actionType);
+		}else{
+			arrowDraw(xcenter,ycenter,innerDist,direction);
+			drawForward(xcenter,ycenter,isBump,actionType);
+		}
+		break;
+	case 1://turn left
+		switch(direction){
+		case "up":
+			direction = "left";
+			break;
+		case "right":
+			direction = "up";
+			break;
+		case "down":
+			direction = "right";
+			break;
+		case "left":
+			direction = "down";
+			break;
+		}
+		arrowDraw(xcenter,ycenter,innerDist,direction);
+		break;
+	case 2://turn right
+		switch(direction){
+		case "up":
+			direction = "right";
+			break;
+		case "right":
+			direction = "down";
+			break;
+		case "down":
+			direction = "left";
+			break;
+		case "left":
+			direction = "up";
+			break;
+		}
+		arrowDraw(xcenter,ycenter,innerDist,direction);
+		break;//turn right
+	case 3://feel front
+		switch(direction){
+		case "up":
+			nextPosX = xcenter;
+			nextPosY = ycenter - interval;break;
+		case "right":
+			nextPosX = xcenter + interval;
+			nextPosY = ycenter;break;
+		case "down":
+			nextPosX = xcenter;
+			nextPosY = ycenter + interval;break;
+		case "left":
+			nextPosX = xcenter - interval;
+			nextPosY = ycenter;break;
+		}
+		isBump = isBoundary(nextPosX,nextPosY);
+		arrowDraw(xcenter,ycenter,innerDist,direction);
+		drawForward(xcenter,ycenter,isBump,actionType);
+		break;
+	case 4://feel left
+		switch(direction){
+		case "up":
+			nextPosX = xcenter-interval;
+			nextPosY = ycenter;break;
+		case "right":
+			nextPosX = xcenter;
+			nextPosY = ycenter-interval;break;
+		case "down":
+			nextPosX = xcenter+interval;
+			nextPosY = ycenter;break;
+		case "left":
+			nextPosX = xcenter;
+			nextPosY = ycenter+interval;break;
+		}
+		isBump = isBoundary(nextPosX,nextPosY);
+		arrowDraw(xcenter,ycenter,innerDist,direction);
+		drawFeelLeft(xcenter,ycenter,isBump);
+		break;
+	case 5://feel right
+		switch(direction){
+		case "up":
+			nextPosX = xcenter+interval;
+			nextPosY = ycenter;break;
+		case "right":
+			nextPosX = xcenter;
+			nextPosY = ycenter+interval;break;
+		case "down":
+			nextPosX = xcenter-interval;
+			nextPosY = ycenter;break;
+		case "left":
+			nextPosX = xcenter;
+			nextPosY = ycenter-interval;break;
+		}
+		isBump = isBoundary(nextPosX,nextPosY);
+		arrowDraw(xcenter,ycenter,innerDist,direction);
+		drawFeelRight(xcenter,ycenter,isBump);
+		break;
+	}
+	return isBump;
+}
+
+
+function clearCurrent(xcenter,ycenter){
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+ 	ctx.clearRect(xcenter-innerDist,ycenter-innerDist,interval,interval);
+}
+
+
+function drawForward(xcenter,ycenter,isBump,actionType){
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	if(!isBump){
+		ctx.fillStyle = "#3F0";
+	}else{//there is a wall in the front
+		if(actionType != 0){
+			ctx.fillStyle = "#F0C";
+		}else{
+			ctx.fillStyle = "#F00";
+		}
+	}
+	switch(direction){
+	case "left":
+		ctx.fillRect(xcenter-innerDist,ycenter-innerDist/2,innerDist/2,innerDist);break;
+	case "up":
+		ctx.fillRect(xcenter-innerDist/2,ycenter-innerDist,innerDist,innerDist/2);break;
+	case "right":
+		ctx.fillRect(xcenter+innerDist/2,ycenter-innerDist/2,innerDist/2,innerDist);break;
+	case "down":
+		ctx.fillRect(xcenter-innerDist/2,ycenter+innerDist/2,innerDist,innerDist/2);break;
+	}
+}
+function drawFeelLeft(xcenter,ycenter,isBump){
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	if(!isBump){
+		ctx.fillStyle = "#3F0";
+	}else{//there is a wall in the front
+		ctx.fillStyle = "#F0C";
+	}
+	switch(direction){
+	case "left":
+		ctx.fillRect(xcenter-innerDist/2,ycenter+innerDist/4,innerDist,innerDist/2);break;
+	case "up":
+		ctx.fillRect(xcenter-innerDist/4*3,ycenter-innerDist/2,innerDist/2,innerDist);break;
+	case "right":
+		ctx.fillRect(xcenter-innerDist/2,ycenter-innerDist/4*3,innerDist,innerDist/2);break;
+	case "down":
+		ctx.fillRect(xcenter+innerDist/4,ycenter-innerDist/2,innerDist/2,innerDist);break;
+	}
+}
+function drawFeelRight(xcenter,ycenter,isBump){
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	if(!isBump){
+		ctx.fillStyle = "#3F0";
+	}else{//there is a wall in the front
+		ctx.fillStyle = "#F0C";
+	}
+	switch(direction){
+	case "left":
+		ctx.fillRect(xcenter-innerDist/2,ycenter-innerDist/4*3,innerDist,innerDist/2);break;
+	case "up":
+		ctx.fillRect(xcenter+innerDist/4,ycenter-innerDist/2,innerDist/2,innerDist);break;
+	case "right":
+		ctx.fillRect(xcenter-innerDist/2,ycenter+innerDist/4,innerDist,innerDist/2);break;
+	case "down":
+		ctx.fillRect(xcenter-innerDist/4*3,ycenter-innerDist/2,innerDist/2,innerDist);break;
+	}
+}
+
+
+function drawActions(){
+	var c=document.getElementById("canvas1");
+	var ctx=c.getContext("2d");
+	ctx.fillStyle = "#30F";
+	ctx.fillRect(innerDist,0,innerDist,interval);
+	ctx.beginPath();
+	ctx.arc(interval,innerDist,innerDist,-Math.PI/2,Math.PI/2,false);
+	ctx.closePath();
+	ctx.fill();
+}
+
+
+
+function isBoundary(nextPosX,nextPosY){
+	var isBoundary = false;
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	var colors = ctx.getImageData(nextPosX, nextPosY, 1, 1).data;
+	var red=colors[0];
+	var green=colors[1];
+	var blue=colors[2];
+	if(red==0 && green==255 && blue==153){
+		isBoundary = true;
+	}
+	return isBoundary;
+}
+
+function getActionString(actionType){
+	var actionS = "";
+	switch(actionType){
+	case 0:actionS="move forward";break;
+	case 1:actionS="turn left";break;
+	case 2:actionS="turn right";break;
+	case 3:actionS="feel front";break;
+	case 4:actionS="feel left";break;
+	case 5:actionS="feel right";break;
+	}
+	return actionS;
+}
+
+var isclickEnv = 1;
+var xindexEnv = 0;
+var yindexEnv = 0;
+function mouseClick(canvas, event){
+	var context = canvas.getContext("2d");	
+    var rect = canvas.getBoundingClientRect();
+    var x = event.clientX - rect.left * (canvas.width / rect.width);
+    var y = event.clientY - rect.top * (canvas.height / rect.height);
+    var clickNum = event.button;
+    if(x>50 && x<450 && y>50 && y<450 && x%50>0 && y%50>0){
+    	var xnumt = parseInt(x/50);
+    	xindexEnv = xnumt;
+		var xnum = xnumt*50;
+		
+		var ynumt = parseInt(y/50);
+		yindexEnv = ynumt;
+		var ynum = ynumt*50;
+		
+		switch(clickNum){
+		case 0:
+			context.fillStyle = "#0F9";
+			context.fillRect(xnum,ynum,50,50);
+			isclickEnv = 0;
+			break;
+		case 2:
+			document.oncontextmenu=new Function("return false");
+			context.clearRect(xnum,ynum,50,50);
+			isclickEnv = 2;
+			break;
+		}
+    }
+}
+
+function initialMaze(){
+	var canvas = document.getElementById("myCanvas");
+	var context = canvas.getContext("2d");
+	canvas.addEventListener("mousedown", function(event) {mouseClick(canvas, event);});
+	
+	var canvas1 = document.getElementById("canvas1");
+	var ctx1 = canvas1.getContext("2d");
+	
+	
+	ctx1.strokeText("Composite Interaction", interval/2, ydraw-8*innerDist/4);
+	ctx1.strokeText("Intended Interaction", interval/2, interval/2+ydraw);
+	ctx1.strokeText("Enacted Interaction", interval/2, 2*interval/2+ydraw);
+	ctx1.strokeText("Interaction Step Number", interval/2, ydraw+3*interval/2);
+	ctx1.strokeText("Valence", interval/2, 2*interval/2+ydraw+2*interval/2);
+	
+	
+	drawEnvironment();
+	isInitialState = "yes";
+	var datas ={
+			"isInitialState":isInitialState,
+			"resultString":resultString,
+			"v_move_forward":$("#v_move_forward").val(),
+			"v_bump":$("#v_bump").val(),
+			"v_turn":$("#v_turn").val(),
+			"v_feel_empty":$("#v_feel_empty").val(),
+			"v_feel_wall":$("#v_feel_wall").val()
+			};
+	$.ajax({
+		url:'/maze/DlServlet',
+	    type:'GET',
+	    async : true,
+	    data:datas,
+	    dataType:'json',
+	    success:function(data,status){
+	    	xcenter = innerDist + data.coordiY*interval;
+	    	ycenter = innerDist + data.coordiX*interval;
+	    	direction = data.direction;
+	    	isInitialState = data.isInitialState;
+	    	arrowDraw(xcenter,ycenter,innerDist,direction);
+	    	var totalValence = data.totalValence;
+	    	$("#totalValence").val(totalValence);
+	    	//drawActions();
+	        },
+	    error:function(){
+	    	alert('isInitial error');
+	    	}
+	});
+}
+
+
+var b=[];
+function interaction(){
+	//alert(resultString)
+	if(startState){
+	var datas ={
+		"isInitialState":isInitialState,
+		"resultString":resultString,
+		"isclickEnv":isclickEnv,
+		"xindexEnv":xindexEnv,
+		"yindexEnv":yindexEnv,
+		
+		"v_move_forward":$("#v_move_forward").val(),
+		"v_bump":$("#v_bump").val(),
+		"v_turn":$("#v_turn").val(),
+		"v_feel_empty":$("#v_feel_empty").val(),
+		"v_feel_wall":$("#v_feel_wall").val()
+		
+	};
+	$.ajax({
+		url:'/maze/DlServlet',
+	    type:'GET',
+	    async : true,
+	    data:datas,
+	    dataType:'json',
+	    success:function(data,status){
+	    	var actionType = data.actionType;
+	    	var drawResult = data.drawResult;
+	    	
+	    	isclickEnv = data.isclickEnv;
+	    	var enactedValence = data.enactedValence;
+	    	//var intlist = data.intlist;
+	    	//alert(intlist);
+	    	//b[b.length]
+	    	/*
+	    	for( var i in intlist){
+	    		//alert(typeof(intlist[i]));
+	    	}
+	    	*/
+	    	var compositeString = data.compositeString;
+	    	
+	    	resultString = data.resultString;
+	    	var totalValence = data.totalValence;
+	    	var loopNum = data.loopNum;
+	    	isReady = data.isReady;
+	    	//alert(isReady);
+	    	
+	    	//alert(actionType);
+	    	var isBump = enactAction(actionType);
+	    	if(isBump)resultString = "yes";
+	    	else resultString = "no";
+	    	if(isReady == "ok"){
+	    		setTimeout('interaction()',$("#time_interval").val());
+	    		isReady = "";
+	    	}
+	    	
+	    	
+	    	var actionString = getActionString(actionType)
+	    	$("#actionType").val(actionString);
+	    	$("#totalValence").val(totalValence);
+	    	$("#loopNum").val(loopNum);
+	    	
+	    	
+	    	//draw intended and enacted
+	    	//drawInteractions(actionType,drawResult,resultString);
+	    	//drawInteractionsNew(intlist);
+	    	var a = [];
+	    	a[a.length] = actionType;
+	    	a[a.length] = drawResult;
+	    	a[a.length] = resultString;//for enacted interaction
+	    	a[a.length] = loopNum;
+	    	a[a.length] = compositeString;
+	    	a[a.length] = enactedValence;
+	    	
+	    	
+	    	//alert(b.length);
+	    	if(b.length<maxShowNum){
+	    		b[b.length] = a;
+	    	}else{
+	    		//alert("1 "+b.length);
+	    		b[b.length] = a;
+	    		for (i = 1; i < b.length; i++) {
+	    			var te = b[i];
+	    			b[i-1] = te;
+	    		 }
+	    		b.pop();
+	    		//alert("2 "+b.length);
+	    	}
+	    	//alert(b.length);
+	    	drawInteractionsNew(b);
+	    	
+	    	/*
+	    	clearCurrent(preXcenter,preYcenter,innerDist);
+	    	arrowDraw(xcenter,ycenter,innerDist,direction);
+			drawForward(xcenter,ycenter,innerDist,direction,goFoward);
+			*/
+	        },
+	    error:function(){
+	    	alert('start error');
+	    	}
+	});
+	}
+}
+
+function start(){
+	startState = true;
+	interaction();
+}
+
+function stop(){
+	startState = false;
+	interaction();
+}
+
+var xdraw = 1260;
+var ydraw = 6*interval/2;
+var limitFront = 25;
+var defaultStartPixel = 1215;
+var maxShowNum = 15;
+var rate = 0.5;
+function drawInteractionsNew(b){
+	//alert("b length is:"+b.length);
+	var canvas=document.getElementById("canvas1");
+	var ctx=canvas.getContext("2d");
+	ctx.clearRect(0,0,canvas.width,canvas.height);
+	
+	ctx.strokeText("Composite Interaction", interval/2, ydraw-8*innerDist/4);
+	ctx.strokeText("Intended Interaction", interval/2, interval/2+ydraw);
+	ctx.strokeText("Enacted Interaction", interval/2, 2*interval/2+ydraw);
+	ctx.strokeText("Interaction Step Number", interval/2, ydraw+3*interval/2);
+	ctx.strokeText("Valence", interval/2, 2*interval/2+ydraw+2*interval/2);
+	
+	if(xdraw>limitFront){
+		xdraw = canvas.width-(b.length)*(interval+innerDist);
+		for(var i in b){
+			drawInteractions(b[i][0],b[i][1],b[i][2],b[i][3],b[i][4],b[i][5]);
+		}
+		xdraw = defaultStartPixel;
+	}
+}
+
+function drawInteractions(actionType,drawResult,resultString,loopNum,compositeString,enactedValence){
+	//alert(xdraw+" "+ydraw);
+	var canvas=document.getElementById("canvas1");
+	var ctx=canvas.getContext("2d");
+	//actionType = 2;
+	
+	//draw the composite interactions
+	if(compositeString == ""){
+		ctx.strokeText("", xdraw, ydraw/2);
+	}else{
+		var xdrawPosition1 = xdraw-2*innerDist;
+		var ydrawPosition1 = ydraw-3*innerDist/4;
+		//ctx.strokeText("["+compositeString+"]", xdrawPosition1, ydrawPosition1);
+		var arr1 = compositeString.split(":");
+		var learnState = arr1[0];
+		
+		var arr2 = arr1[1].split(",");
+		//alert(arr2);
+		var actiontype1 = parseInt(arr2[0]);
+		var result1 = parseInt(arr2[1]);
+		
+		var actiontype2 = parseInt(arr2[2]);
+		var result2 = parseInt(arr2[3]);
+		//alert(actiontype1+" and "+result1);
+		if(xdrawPosition1>120){
+			ctx.strokeText(learnState, xdrawPosition1, ydrawPosition1);//show learn or reinforce
+			drawCompositeInteraction(ctx,xdrawPosition1,ydrawPosition1-innerDist*2,actiontype1,result1,rate);
+			drawCompositeInteraction(ctx,xdrawPosition1+innerDist+Math.round(12*rate),ydrawPosition1-innerDist*2,actiontype2,result2,rate);
+			ctx.strokeRect(xdrawPosition1,ydrawPosition1-innerDist*2-2,2*interval*rate+8,interval*rate+5);
+		}
+		
+	}
+	
+	//alert(actionType);
+	//draw once of intended interaction and enacted interaction
+	switch(actionType){
+	case 0:
+		//intended interaction
+		if(drawResult == 1){
+			ctx.fillStyle = "#3F0";
+		}else{
+			ctx.fillStyle = "#F00";
+		}
+		ctx.fillRect(xdraw,ydraw,50,50);
+		ctx.strokeRect(xdraw,ydraw,50,50);
+		
+		//enacted interaction
+		if(resultString == "no"){
+			ctx.fillStyle = "#3F0";
+		}else{
+			ctx.fillStyle = "#F00";
+		}
+		ctx.fillRect(xdraw+innerDist/2,ydraw+innerDist/2,50,50);
+		ctx.strokeRect(xdraw+innerDist/2,ydraw+innerDist/2,50,50);
+		
+		break;
+	case 1:
+		drawTurnLeft(ctx,xdraw,ydraw,1);
+		drawTurnLeft(ctx,xdraw+innerDist/2,ydraw+innerDist/2,1);
+		break;
+	case 2:
+		drawTurnRight(ctx,xdraw,ydraw,1);
+		drawTurnRight(ctx,xdraw+innerDist/2,ydraw+innerDist/2,1);
+		break;
+	case 3:
+		if(drawResult == 1){
+			ctx.fillStyle = "#3F6";
+		}else{
+			ctx.fillStyle = "#F0C";
+		}
+		ctx.fillRect(xdraw,ydraw,50,50);
+		ctx.strokeRect(xdraw,ydraw,50,50);
+		
+		if(resultString == "no"){
+			ctx.fillStyle = "#3F6";
+		}else{
+			ctx.fillStyle = "#F0C";
+		}
+		ctx.fillRect(xdraw+innerDist/2,ydraw+innerDist/2,50,50);
+		ctx.strokeRect(xdraw+innerDist/2,ydraw+innerDist/2,50,50);
+		break;
+	case 4:
+		drawFeelLeftInteraction(ctx,xdraw,ydraw,drawResult,1);
+		drawFeelLeftInteraction1(ctx,xdraw+innerDist/2,ydraw+innerDist/2,resultString);
+		break;
+	case 5:
+		drawFeelRightInteraction(ctx,xdraw,ydraw,drawResult,1);
+		drawFeelRightInteraction1(ctx,xdraw+innerDist/2,ydraw+innerDist/2,resultString);
+		break;
+	}
+	ctx.strokeText(loopNum, xdraw+interval/2, ydraw+3*interval/2);
+	ctx.strokeText(enactedValence, xdraw+interval/2, ydraw+4*interval/2);
+	xdraw = xdraw+innerDist+interval;
+	//alert(xdraw);
+}
+
+function drawCompositeInteraction(ctx,xdrawPosition1,ydrawPosition1,actiontype1,result1,rate){
+	//drawFeelLeftInteraction(ctx,xdrawPosition1,ydrawPosition1,result1,rate);
+	//drawFeelRightInteraction(ctx,xdrawPosition1,ydrawPosition1,result1,rate);
+	//drawTurnLeft(ctx,xdrawPosition1,ydrawPosition1,rate)
+	//drawTurnRight(ctx,xdrawPosition1,ydrawPosition1,rate)
+	switch(actiontype1){
+	case 0:
+		drawSquareMove(ctx,xdrawPosition1,ydrawPosition1,result1,rate);
+		break;
+	case 1:drawTurnLeft(ctx,xdrawPosition1,ydrawPosition1,rate);
+		break;
+	case 2:drawTurnRight(ctx,xdrawPosition1,ydrawPosition1,rate);
+		break;
+	case 3:
+		drawSquareFeel(ctx,xdrawPosition1,ydrawPosition1,result1,rate);
+		break;
+	case 4:drawFeelLeftInteraction(ctx,xdrawPosition1,ydrawPosition1,result1,rate);
+		break;
+	case 5:drawFeelRightInteraction(ctx,xdrawPosition1,ydrawPosition1,result1,rate);
+		break;
+	}
+}
+
+
+
+function drawTurnLeft(ctx,xdraw,ydraw,rate){
+	ctx.beginPath();
+	ctx.moveTo(xdraw+Math.round(innerDist*rate),ydraw);
+	ctx.lineTo(xdraw+2*Math.round(innerDist*rate),ydraw);
+	ctx.lineTo(xdraw+2*Math.round(innerDist*rate),ydraw+2*Math.round(innerDist*rate));
+	ctx.lineTo(xdraw+Math.round(innerDist*rate),ydraw+2*Math.round(innerDist*rate));
+	ctx.arc(xdraw+Math.round(innerDist*rate),ydraw+Math.round(innerDist*rate),Math.round(innerDist*rate), Math.PI/2,3*Math.PI/2,false);
+	ctx.closePath();
+	ctx.fillStyle = "#CCC";
+	ctx.fill();
+	ctx.stroke();
+}
+
+function drawTurnRight(ctx,xdraw,ydraw,rate){
+	ctx.beginPath();
+	ctx.moveTo(xdraw+Math.round(innerDist*rate),ydraw);
+	ctx.lineTo(xdraw,ydraw);
+	ctx.lineTo(xdraw,ydraw+2*Math.round(innerDist*rate));
+	ctx.lineTo(xdraw+Math.round(innerDist*rate),ydraw+2*Math.round(innerDist*rate));
+	ctx.arc(xdraw+Math.round(innerDist*rate),ydraw+Math.round(innerDist*rate),Math.round(innerDist*rate), Math.PI/2,-Math.PI/2,true);
+	ctx.closePath();
+	ctx.fillStyle = "#CCC";
+	ctx.fill();
+	ctx.stroke();
+}
+
+function drawSquareMove(ctx,xdraw,ydraw,drawResult,rate){
+	if(drawResult == 1){
+		ctx.fillStyle = "#3F0";
+	}else{
+		ctx.fillStyle = "#F00";
+	}
+	ctx.fillRect(xdraw,ydraw,2*Math.round(innerDist*rate),2*Math.round(innerDist*rate));
+	ctx.strokeRect(xdraw,ydraw,2*Math.round(innerDist*rate),2*Math.round(innerDist*rate));
+}
+
+function drawSquareFeel(ctx,xdraw,ydraw,drawResult,rate){
+	if(drawResult == 1){
+		ctx.fillStyle = "#3F6";
+	}else{
+		ctx.fillStyle = "#F0C";
+	}
+	ctx.fillRect(xdraw,ydraw,2*Math.round(innerDist*rate),2*Math.round(innerDist*rate));
+	ctx.strokeRect(xdraw,ydraw,2*Math.round(innerDist*rate),2*Math.round(innerDist*rate));
+}
+
+
+
+
+function drawFeelLeftInteraction(ctx,xdraw,ydraw,drawResult,rate){
+	if(drawResult == 1){
+		ctx.fillStyle = "#3F6";
+	}else{
+		ctx.fillStyle = "#F0C";
+	}
+	ctx.beginPath();
+	ctx.moveTo(xdraw,ydraw);
+	ctx.lineTo(xdraw,ydraw+Math.round(interval*rate));
+	ctx.lineTo(xdraw+Math.round(interval*rate),ydraw+Math.round((7*innerDist/4)*rate));
+	ctx.lineTo(xdraw+Math.round(interval*rate),ydraw+Math.round((innerDist/4)*rate));
+	ctx.closePath();
+	ctx.fill();
+	ctx.stroke();
+}
+
+function drawFeelLeftInteraction1(ctx,xdraw,ydraw,resultString){
+	if(resultString == "no"){
+		ctx.fillStyle = "#3F6";
+	}else{
+		ctx.fillStyle = "#F0C";
+	}
+	ctx.beginPath();
+	ctx.moveTo(xdraw,ydraw);
+	ctx.lineTo(xdraw,ydraw+interval);
+	ctx.lineTo(xdraw+interval,ydraw+7*innerDist/4);
+	ctx.lineTo(xdraw+interval,ydraw+innerDist/4);
+	ctx.closePath();
+	ctx.fill();
+	ctx.stroke();
+}
+
+function drawFeelRightInteraction(ctx,xdraw,ydraw,drawResult,rate){
+	if(drawResult == 1){
+		ctx.fillStyle = "#3F6";
+	}else{
+		ctx.fillStyle = "#F0C";
+	}
+	ctx.beginPath();
+	ctx.moveTo(xdraw,ydraw+Math.round((innerDist/4)*rate));
+	ctx.lineTo(xdraw,ydraw+Math.round((7*innerDist/4)*rate));
+	ctx.lineTo(xdraw+Math.round(interval*rate),ydraw+Math.round(interval*rate));
+	ctx.lineTo(xdraw+Math.round(interval*rate),ydraw);
+	ctx.closePath();
+	ctx.fill();
+	ctx.stroke();
+}
+
+function drawFeelRightInteraction1(ctx,xdraw,ydraw,resultString){
+	if(resultString == "no"){
+		ctx.fillStyle = "#3F6";
+	}else{
+		ctx.fillStyle = "#F0C";
+	}
+	ctx.beginPath();
+	ctx.moveTo(xdraw,ydraw+innerDist/4);
+	ctx.lineTo(xdraw,ydraw+7*innerDist/4);
+	ctx.lineTo(xdraw+interval,ydraw+interval);
+	ctx.lineTo(xdraw+interval,ydraw);
+	ctx.closePath();
+	ctx.fill();
+	ctx.stroke();
+}
+
+
+function reset(){
+	alert("Reset process is done!");
+	//window.open('page.html');
+}
+
+</script>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Developmental learning </title>
+<style type="text/css">
+.test {
+	text-align: center;
+}
+.canvas {
+	text-align: left;
+}
+.canvas p {
+	font-family: Arial, Helvetica, sans-serif;
+}
+.canvas table tr td {
+	font-family: Arial, Helvetica, sans-serif;
+	text-align: center;
+}
+.canvas table tr td table {
+	text-align: center;
+}
+.canvas table tr td table tr td {
+	text-align: center;
+}
+</style>
+</head>
+
+<body class="canvas" onload="initialMaze();">
+
+<table width="1366" height="588" border="0">
+<tr>
+    <td width="582" height="537" align="center" valign="middle"><canvas id="myCanvas" width="500" height="500" ></canvas></td>
+    <td width="464"><table width="484" height="232" border="1" cellspacing="0">
+      <td height="39" colspan="3">Parameters</td>
+      <tr>
+        <td height="39">move forward:</td>
+        <td><input type="number" id="v_move_forward"  name="v_move_forward" value="5" style="width:100px;"></td>
+        <td><img src="images/move_forward.jpg" width="33" height="33" /></td>
+      </tr>
+      <tr>
+        <td height="39">bump: </td>
+        <td><input type="number" id="v_bump"  name="v_bump" value="-10" style="width:100px;"></td>
+        <td><img src="images/bump.jpg" width="33" height="33" /></td>
+      </tr>
+      <tr>
+        <td height="39">turn:</td>
+        <td><input type="number" id="v_turn"  name="v_turn" value="-3" style="width:100px;"></td>
+        <td><img src="images/turn_left.jpg" width="33" height="33" />&nbsp;&nbsp;<img src="images/turn_right.jpg" width="33" height="33" /></td>
+      </tr>
+      <tr>
+        <td height="39">feel empty:</td>
+        <td><input type="number" id="v_feel_empty"  name="v_feel_empty" value="-1" style="width:100px;"></td>
+        <td><img src="images/feel_front_empty.jpg" width="33" height="33" />&nbsp;&nbsp;<img src="images/feel_left_empty.jpg" width="33" height="33" />&nbsp;&nbsp;<img src="images/feel_right_empty.jpg" width="33" height="33" /></td>
+      </tr>
+      <tr>
+        <td width="178" height="39">feel the wall:</td>
+        <td><input type="number" id="v_feel_wall" name="v_feel_wall" value="-2" style="width:100px;"/></td>
+        <td><img src="images/feel_front_wall.jpg" width="33" height="33" />&nbsp;&nbsp;<img src="images/feel_left_wall.jpg" width="33" height="33" />&nbsp;&nbsp;<img src="images/feel_right_wall.jpg" width="33" height="33" /></td>
+      </tr>
+      <tr>
+        <td width="178" height="39">time interval:</td>
+        <td><input type="number" id="time_interval" name="time_interval" value="500" style="width:70px;"/>ms</td>
+      </tr>
+      <tr>
+        <td width="178" height="39">actionType:</td>
+        <td><input type="text" id="actionType" name="actionType" value=""  style="width:100px;"/></td>
+      </tr>
+      <tr>
+        <td width="178" height="39">Total Valence:</td>
+        <td><input type="number" id="totalValence" name="totalValence" value="0" style="width:100px;"/></td>
+      </tr>
+      <tr>
+        <td width="178" height="39">loop num:</td>
+        <td><input type="number" id="loopNum" name="loopNum" value="0" style="width:100px;"/></td>
+      </tr>
+      <tr>
+        <td height="39" colspan="2">
+        	<button type="button" onclick="start()">Start</button>&nbsp;&nbsp;
+        	<button type="button" onclick="stop()">Stop</button>&nbsp;&nbsp;
+        	<button type="button" onclick="reset()">Reset</button>
+        </td>
+      </tr>
+    </table></td>
+    <!-- <td width="200" height="537" align="center" valign="middle"><canvas id="canvas1" width="200" height="500" ></canvas></td> -->
+  </tr>
+</table>
+<p>&nbsp;</p>
+<table width="1290" height="300" border="1" cellpadding="0" cellspacing="0" >
+  <tr>
+    <td width="1290"><canvas id="canvas1" width="1290" height="300"></canvas></td>
+  </tr>
+</table>
+<p>
+<table width="20%" align="center" >
+<img src="images/logo_liris.png" width="10%" /> &nbsp;&nbsp;&nbsp;&nbsp;<img src="images/SMA.jpg" width="10%"/>
+</table>
+
+
+
+<!-- 
+<div id="myDiv"><h2>Using the methods submit the interactions</h2></div>
+<button type="button" onclick="loadXMLDoc()">Edit the content</button>
+<p class="test">adfdasfdffad</p>
+https://www.youtube.com/watch?v=LVZ0cPpmSu8
+
+point1. color could be used to identify this learning process.
+ -->
+</body>
+</html>

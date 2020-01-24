@@ -1,0 +1,93 @@
+package dl;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
+public class Test1 {
+	public String direction = "up";
+	public int env[][] = {
+			{1,1,1,1,1,1,1,1,1,1},
+			{1,0,0,0,0,0,0,0,1,1},
+			{1,0,1,1,1,1,1,0,0,1},
+			{1,0,1,1,1,1,1,1,0,1},
+			{1,0,1,1,1,1,1,1,0,1},
+			{1,0,1,1,1,1,1,1,0,1},
+			{1,0,1,1,1,1,1,1,0,1},
+			{1,0,0,1,1,1,1,1,0,1},
+			{1,1,0,0,0,0,0,0,0,1},
+			{1,1,1,1,1,1,1,1,1,1}
+			};
+	
+	public Test1() {
+		
+		int i = 1;
+		int j = 1;
+		Position position = new Position();
+		position.setPointX(i);
+		position.setPointY(j);
+		System.out.println(env[i][j]);
+		int result = enact(1,position);
+		System.out.println(env[0][0]);
+		
+		int width = env.length;
+		int height = env[0].length;
+		System.out.println("the size of env is:"+width+" "+height);
+		for(int k=0;k<width;k++) {
+			for(int z=0;z<height;z++) {
+				if(env[k][z] == 1)System.out.print("*");
+				else if(k==position.getPointX() && z==position.getPointY()) {
+					System.out.print("/");
+				}else {
+					System.out.print("-");
+				}
+			}
+			System.out.println();
+		}		
+	}
+	
+	
+	private int enact(int actionType,Position randomPosition) {
+		int interactResult = 0;
+		int poX = randomPosition.getPointX();
+		int poY = randomPosition.getPointY();
+		
+		switch(actionType) {
+		case 0://move forward
+			switch(direction) {
+			case "up":
+				if(env[poX-1][poY] == 0) {
+					interactResult = 1;
+					randomPosition.setPointX(poX-1);
+				}break;
+			case "right":
+				if(env[poX][poY+1] == 0) {
+					interactResult = 1;
+					randomPosition.setPointY(poY+1);
+				}break;
+			case "down":
+				if(env[poX+1][poY] == 0) {
+					interactResult = 1;
+					randomPosition.setPointX(poX+1);
+				}break;
+			case "left":
+				if(env[poX][poY-1] == 0) {
+					interactResult = 1;
+					randomPosition.setPointY(poY-1);
+				}break;
+			}break;
+		}
+		System.out.println("current postion is:"+randomPosition.getPointX()+" "+randomPosition.getPointY());
+		System.out.println("the result is:"+interactResult);
+		return interactResult;
+	}
+
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Test1 tes1 = new Test1();
+	}
+}
